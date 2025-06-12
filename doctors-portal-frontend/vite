@@ -1,0 +1,332 @@
+
+
+  VITE v6.2.6  ready in 163 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+16:22:50 [vite] (client) hmr update /src/style.css
+16:24:54 [vite] (client) hmr update /src/style.css (x2)
+16:25:11 [vite] (client) hmr update /src/style.css (x3)
+16:25:12 [vite] (client) hmr update /src/style.css (x4)
+16:27:32 [vite] (client) hmr update /src/style.css (x5)
+16:28:22 [vite] (client) hmr update /src/style.css (x6)
+16:29:08 [vite] (client) hmr update /src/components/LoginForm.vue
+16:31:40 [vite] (client) hmr update /src/components/LoginForm.vue (x2)
+16:31:46 [vite] (client) hmr update /src/components/LoginForm.vue (x3)
+16:32:37 [vite] (client) hmr update /src/components/LoginForm.vue (x4)
+16:32:46 [vite] (client) hmr update /src/components/LoginForm.vue?vue&type=style&index=0&scoped=ba684ca4&lang.css
+16:47:13 [vite] (client) page rel16:47:13 [vite] (client) page rel16:47:13 [vite] (client) page rel16:47:13 [vite] (cve-16:47:13 [vite] (client) .t16:47oes the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/main.ts:4:30
+  2  |  import App from "./App.vue";
+  3  |  import router from "./router";
+  4  |  import { createNaiveUI } from "./naive-ui-config";
+     |                                 ^
+  5  |  const app = createApp(App);
+  6  |  import naive from "naive-ui";
+16:47:13 [vite] (client) Pre-transform error: [vue/compiler-sfc] Identifier 'ref' has already been declared. (16:11)
+
+/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/components/LoginForm.vue
+91 |    } from 'naive-ui'
+92 |
+93 |    import { ref } from 'vue'
+   |             ^
+94 |  import { useRouter } from 'vue-router'
+95 |
+  Plugin: vite:vue
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/components/LoginForm.vue:16:11
+  7  |      >      <n-form
+  8  |          ref="formRef"
+  9  |          :model="formValue"
+     |  ^
+  10 |          :rules="rules"
+  11 |          size="large"
+16:47:13 [vite] (client) Pre-transform error: Failed to resolve import "vue-router" from "src/router/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/router/index.js:1:49
+  1  |  import { createRouter, createWebHistory } from 'vue-router'
+     |                                                  ^
+  2  |  import { NMessageProvider } from 'naive-ui'
+  3  |
+16:47:13 [vite] Internal server error: Failed to resolve import "./naive-ui-config" from "src/main.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/main.ts:4:30
+  2  |  import App from "./App.vue";
+  3  |  import router from "./router";
+  4  |  import { createNaiveUI } from "./naive-ui-config";
+     |                                 ^
+  5  |  const app = createApp(App);
+  6  |  import naive from "naive-ui";
+      at TransformPluginContext._formatLog (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47897:41)
+      at TransformPluginContext.error (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47894:16)
+      at normalizeUrl (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46027:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46146:37
+      at async Promise.all (index 3)
+      at async TransformPluginContext.transform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46073:7)
+      at async EnvironmentPluginContainer.transform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47692:18)
+      at async loadAndTransform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:41327:27)
+      at async viteTransformMiddleware (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:42807:24)
+16:47:13 [vite] (client) Pre-transform error: Failed to resolve import "vue-router" from "src/router/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/router/index.js:1:49
+  1  |  import { createRouter, createWebHistory } from 'vue-router'
+     |                                                  ^
+  2  |  import { NMessageProvider } from 'naive-ui'
+  3  |
+16:47:17 [vite] (client) page reload src/main.ts
+16:47:17 [vite] (client) Pre-transform error: Failed to resolve import "vue-router" from "src/router/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/router/index.js:1:49
+  1  |  import { createRouter, createWebHistory } from 'vue-router'
+     |                                                  ^
+  2  |  import { NMessageProvider } from 'naive-ui'
+  3  |
+16:47:17 [vite] Internal server error: Failed to resolve import "vue-router" from "src/router/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/router/index.js:1:49
+  1  |  import { createRouter, createWebHistory } from 'vue-router'
+     |                                                  ^
+  2  |  import { NMessageProvider } from 'naive-ui'
+  3  |
+      at TransformPluginContext._formatLog (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47897:41)
+      at TransformPluginContext.error (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47894:16)
+      at normalizeUrl (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46027:23)
+      at async file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46146:37
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46073:7)
+      at async EnvironmentPluginContainer.transform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47692:18)
+      at async loadAndTransform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:41327:27)
+      at async viteTransformMiddleware (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:42807:24)
+16:47:36 [vite] (client) page reload src/main.ts
+16:47:36 [vite] (client) Pre-transform error: Failed to resolve import "vue-router" from "src/router/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/router/index.js:1:49
+  1  |  import { createRouter, createWebHistory } from 'vue-router'
+     |                                                  ^
+  2  |  import { NMessageProvider } from 'naive-ui'
+  3  |
+16:47:36 [vite] Internal server error: Failed to resolve import "vue-router" from "src/router/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/router/index.js:1:49
+  1  |  import { createRouter, createWebHistory } from 'vue-router'
+     |                                                  ^
+  2  |  import { NMessageProvider } from 'naive-ui'
+  3  |
+      at TransformPluginContext._formatLog (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47897:41)
+      at TransformPluginContext.error (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47894:16)
+      at normalizeUrl (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46027:23)
+      at async file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46146:37
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46073:7)
+      at async EnvironmentPluginContainer.transform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47692:18)
+      at async loadAndTransform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:41327:27)
+      at async viteTransformMiddleware (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:42807:24)
+16:47:36 [vite] Internal server error: [vue/compiler-sfc] Identifier 'ref' has already been declared. (16:11)
+
+/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/components/LoginForm.vue
+91 |    } from 'naive-ui'
+92 |
+93 |    import { ref } from 'vue'
+   |             ^
+94 |  import { useRouter } from 'vue-router'
+95 |
+  Plugin: vite:vue
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/components/LoginForm.vue:16:11
+  7  |      >      <n-form
+  8  |          ref="formRef"
+  9  |          :model="formValue"
+     |  ^
+  10 |          :rules="rules"
+  11 |          size="large"
+      at constructor (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:360:19)
+      at Parser.raise (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:3338:19)
+      at ScopeHandler.checkRedeclarationInScope (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:1566:19)
+      at ScopeHandler.declareName (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:1532:12)
+      at Parser.declareNameFromIdentifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:7494:16)
+      at Parser.checkIdentifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:7490:12)
+      at Parser.checkLVal (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:7431:12)
+      at Parser.finishImportSpecifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:13926:10)
+      at Parser.parseImportSpecifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:14083:17)
+      at Parser.parseNamedImportSpecifiers (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:14062:36)
+16:47:40 [vite] (client) page reload src/main.ts
+16:47:40 [vite] (client) Pre-transform error: Failed to resolve import "vue-router" from "src/router/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/router/index.js:1:49
+  1  |  import { createRouter, createWebHistory } from 'vue-router'
+     |                                                  ^
+  2  |  import { NMessageProvider } from 'naive-ui'
+  3  |
+16:47:40 [vite] Internal server error: Failed to resolve import "vue-router" from "src/router/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/router/index.js:1:49
+  1  |  import { createRouter, createWebHistory } from 'vue-router'
+     |                                                  ^
+  2  |  import { NMessageProvider } from 'naive-ui'
+  3  |
+      at TransformPluginContext._formatLog (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47897:41)
+      at TransformPluginContext.error (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47894:16)
+      at normalizeUrl (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46027:23)
+      at async file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46146:37
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46073:7)
+      at async EnvironmentPluginContainer.transform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47692:18)
+      at async loadAndTransform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:41327:27)
+      at async viteTransformMiddleware (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:42807:24)
+16:47:40 [vite] Internal server error: [vue/compiler-sfc] Identifier 'ref' has already been declared. (16:11)
+
+/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/components/LoginForm.vue
+91 |    } from 'naive-ui'
+92 |
+93 |    import { ref } from 'vue'
+   |             ^
+94 |  import { useRouter } from 'vue-router'
+95 |
+  Plugin: vite:vue
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/components/LoginForm.vue:16:11
+  7  |      >      <n-form
+  8  |          ref="formRef"
+  9  |          :model="formValue"
+     |  ^
+  10 |          :rules="rules"
+  11 |          size="large"
+      at constructor (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:360:19)
+      at Parser.raise (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:3338:19)
+      at ScopeHandler.checkRedeclarationInScope (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:1566:19)
+      at ScopeHandler.declareName (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:1532:12)
+      at Parser.declareNameFromIdentifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:7494:16)
+      at Parser.checkIdentifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:7490:12)
+      at Parser.checkLVal (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:7431:12)
+      at Parser.finishImportSpecifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:13926:10)
+      at Parser.parseImportSpecifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:14083:17)
+      at Parser.parseNamedImportSpecifiers (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:14062:36)
+16:48:10 [vite] (client) page reload src/views/DashboardHome.vue
+16:48:11 [vite] (client) Pre-transform error: Failed to resolve import "vue-router" from "src/router/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/router/index.js:1:49
+  1  |  import { createRouter, createWebHistory } from 'vue-router'
+     |                                                  ^
+  2  |  import { NMessageProvider } from 'naive-ui'
+  3  |
+16:48:11 [vite] Internal server error: Failed to resolve import "vue-router" from "src/router/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/router/index.js:1:49
+  1  |  import { createRouter, createWebHistory } from 'vue-router'
+     |                                                  ^
+  2  |  import { NMessageProvider } from 'naive-ui'
+  3  |
+      at TransformPluginContext._formatLog (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47897:41)
+      at TransformPluginContext.error (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47894:16)
+      at normalizeUrl (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46027:23)
+      at async file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46146:37
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46073:7)
+      at async EnvironmentPluginContainer.transform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47692:18)
+      at async loadAndTransform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:41327:27)
+      at async viteTransformMiddleware (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:42807:24)
+16:48:11 [vite] Internal server error: [vue/compiler-sfc] Identifier 'ref' has already been declared. (16:11)
+
+/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/components/LoginForm.vue
+91 |    } from 'naive-ui'
+92 |
+93 |    import { ref } from 'vue'
+   |             ^
+94 |  import { useRouter } from 'vue-router'
+95 |
+  Plugin: vite:vue
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/components/LoginForm.vue:16:11
+  7  |      >      <n-form
+  8  |          ref="formRef"
+  9  |          :model="formValue"
+     |  ^
+  10 |          :rules="rules"
+  11 |          size="large"
+      at constructor (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:360:19)
+      at Parser.raise (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:3338:19)
+      at ScopeHandler.checkRedeclarationInScope (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:1566:19)
+      at ScopeHandler.declareName (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:1532:12)
+      at Parser.declareNameFromIdentifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:7494:16)
+      at Parser.checkIdentifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:7490:12)
+      at Parser.checkLVal (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:7431:12)
+      at Parser.finishImportSpecifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:13926:10)
+      at Parser.parseImportSpecifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:14083:17)
+      at Parser.parseNamedImportSpecifiers (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:14062:36)
+16:48:31 [vite] (client) page reload src/views/DashboardProfile.vue
+16:48:31 [vite] (client) Pre-transform error: Failed to resolve import "vue-router" from "src/router/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/router/index.js:1:49
+  1  |  import { createRouter, createWebHistory } from 'vue-router'
+     |                                                  ^
+  2  |  import { NMessageProvider } from 'naive-ui'
+  3  |
+16:48:31 [vite] Internal server error: Failed to resolve import "vue-router" from "src/router/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/router/index.js:1:49
+  1  |  import { createRouter, createWebHistory } from 'vue-router'
+     |                                                  ^
+  2  |  import { NMessageProvider } from 'naive-ui'
+  3  |
+      at TransformPluginContext._formatLog (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47897:41)
+      at TransformPluginContext.error (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47894:16)
+      at normalizeUrl (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46027:23)
+      at async file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46146:37
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46073:7)
+      at async EnvironmentPluginContainer.transform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47692:18)
+      at async loadAndTransform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:41327:27)
+      at async viteTransformMiddleware (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:42807:24)
+16:48:31 [vite] Internal server error: [vue/compiler-sfc] Identifier 'ref' has already been declared. (16:11)
+
+/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/components/LoginForm.vue
+91 |    } from 'naive-ui'
+92 |
+93 |    import { ref } from 'vue'
+   |             ^
+94 |  import { useRouter } from 'vue-router'
+95 |
+  Plugin: vite:vue
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/components/LoginForm.vue:16:11
+  7  |      >      <n-form
+  8  |          ref="formRef"
+  9  |          :model="formValue"
+     |  ^
+  10 |          :rules="rules"
+  11 |          size="large"
+      at constructor (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:360:19)
+      at Parser.raise (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:3338:19)
+      at ScopeHandler.checkRedeclarationInScope (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:1566:19)
+      at ScopeHandler.declareName (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:1532:12)
+      at Parser.declareNameFromIdentifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:7494:16)
+      at Parser.checkIdentifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:7490:12)
+      at Parser.checkLVal (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:7431:12)
+      at Parser.finishImportSpecifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:13926:10)
+      at Parser.parseImportSpecifier (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:14083:17)
+      at Parser.parseNamedImportSpecifiers (/Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/@babel/parser/lib/index.js:14062:36)
+16:48:39 [vite] (client) hmr update /src/App.vue
+16:48:40 [vite] (client) Pre-transform error: Failed to resolve import "vue-router" from "src/router/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/router/index.js:1:49
+  1  |  import { createRouter, createWebHistory } from 'vue-router'
+     |                                                  ^
+  2  |  import { NMessageProvider } from 'naive-ui'
+  3  |
+16:48:40 [vite] Internal server error: Failed to resolve import "vue-router" from "src/router/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/src/router/index.js:1:49
+  1  |  import { createRouter, createWebHistory } from 'vue-router'
+     |                                                  ^
+  2  |  import { NMessageProvider } from 'naive-ui'
+  3  |
+      at TransformPluginContext._formatLog (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47897:41)
+      at TransformPluginContext.error (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47894:16)
+      at normalizeUrl (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46027:23)
+      at async file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46146:37
+      at async Promise.all (index 0)
+      at async TransformPluginContext.transform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:46073:7)
+      at async EnvironmentPluginContainer.transform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:47692:18)
+      at async loadAndTransform (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:41327:27)
+      at async viteTransformMiddleware (file:///Users/hs/Documents/Doctors-Portal/doctors-portal-frontend/node_modules/vite/dist/node/chunks/dep-Bid9ssRr.js:42807:24)
+
+[201~
+
