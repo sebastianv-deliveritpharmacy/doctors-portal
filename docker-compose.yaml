@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  # Backend Web Server (NGINX)
+  backend-web:
+    image: nginx:latest
+    container_name: doctors-backend-web
+    volumes:
+      - ./doctors-portal-backend:/var/www
+      - ./doctors-portal-backend/docker/development/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8000:80" # frontend stays at 5173
+    networks:
+      - doctors-network
+    depends_on:
+      php-fpm:
+        condition: service_started
+
+  php-fpm:
+    container_name: doctors-backend-php
+    build:
+      context: ./doctors-portal-backend
+      dockerfile: ./docker/common/php-fpm/Dockerfile
+      target: development
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+        XDEBUG_ENABLED: ${XDEBUG_ENABLED:-true}
+        XDEBUG_MODE: develop,coverage,debug,profile
+        XDEBUG_HOST: ${XDEBUG_HOST:-host.docker.internal}
+        XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY:-DOCKER}
+        XDEBUG_LOG: /dev/stdout
+        XDEBUG_LOG_LEVEL: 0
+    env_file:
+      - ./doctors-portal-backend/.env
+    user: "${UID:-1000}:${GID:-1000}"
+    volumes:
+      - ./doctors-portal-backend:/var/www
+    networks:
+      - doctors-network
+    depends_on:
+      mysql:
+        condition: service_started
+
+  mysql:
+    image: mysql:8.0
+    container_name: doctors-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: Hailtotheking!1
+      MYSQL_DATABASE: doctors-portal
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - doctors-network
+
+  workspace:
+    build:
+      context: ./doctors-portal-backend
+      dockerfile: ./docker/development/workspace/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+        XDEBUG_ENABLED: ${XDEBUG_ENABLED:-true}
+        XDEBUG_MODE: develop,coverage,debug,profile
+        XDEBUG_HOST: ${XDEBUG_HOST:-host.docker.internal}
+        XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY:-DOCKER}
+        XDEBUG_LOG: /dev/stdout
+        XDEBUG_LOG_LEVEL: 0
+    tty: true
+    stdin_open: true
+    env_file:
+      - ./doctors-portal-backend/.env
+    volumes:
+      - ./doctors-portal-backend:/var/www
+    networks:
+      - doctors-network
+
+  frontend:
+    build:
+      context: ./doctors-portal-frontend
+      dockerfile: Dockerfile
+    container_name: doctors-frontend
+    ports:
+      - "5173:8080"
+    networks:
+      - doctors-network
+
+volumes:
+  mysql-data:
+
+networks:
+  doctors-network:
