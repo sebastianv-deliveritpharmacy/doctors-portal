@@ -72,6 +72,7 @@ services:
     stdin_open: true
     env_file:
       - ./doctors-portal-backend/.env
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./doctors-portal-backend:/var/www
     networks:

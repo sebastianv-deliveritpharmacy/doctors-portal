@@ -16,7 +16,7 @@
           />
 
           <!-- Headline -->
-          <n-h2 class="welcome-text">Welcome to DeliverIt Doctor's Portal</n-h2>
+          <n-h2 class="welcome-text">Welcome to DeliverIt's Doctor Portal</n-h2>
           <n-p class="subtitle">
             Streamline prescription management and referral tracking with real-time integration.
           </n-p>
