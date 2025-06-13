@@ -6,7 +6,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:5173', 'https://your-vue-app.com'],
+    'allowed_origins' => ['*'], // or ['http://localhost:5173'] for more control
 
     'allowed_origins_patterns' => [],
 
