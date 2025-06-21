@@ -14,13 +14,15 @@
     </n-space>
 
     <!-- Table -->
-    <n-data-table
-      :columns="columns"
-      :data="filteredUsers"
-      :loading="loading"
-      :bordered="true"
-      striped
-    />
+    <div class="table-responsive">
+      <n-data-table
+        :columns="columns"
+        :data="filteredUsers"
+        :loading="loading"
+        :bordered="true"
+        striped
+      />
+    </div>
 
     <!-- Pagination -->
     <n-space justify="end" class="mt-4">
@@ -95,6 +97,7 @@ import {
 } from 'naive-ui'
 import { AlertCircleOutline } from '@vicons/ionicons5'
 import axios from '@/api/axios'
+import { useRouter } from 'vue-router'
 
 const users = ref([])
 const loading = ref(false)
@@ -104,6 +107,7 @@ const message = useMessage()
 const dialog = useDialog()
 const addUserFormRef = ref(null)
 const editingUserId = ref(null)
+const router = useRouter()
 
 const newUser = ref({
   name: '',
@@ -133,6 +137,7 @@ const rules = {
 const columns = [
   { title: 'Name', key: 'name' },
   { title: 'Email', key: 'email' },
+  
   {
     title: 'Actions',
     key: 'actions',
@@ -142,6 +147,12 @@ const columns = [
           size: 'small', type: 'info', secondary: true,
           onClick: () => openEditUserModal(row)
         }, { default: () => 'Edit' }),
+
+        h(NButton, {
+          size: 'small', type: 'primary', secondary: true,
+          onClick: () => viewPrescriptions(row.id)
+        }, { default: () => 'Prescriptions' }),
+
         h(NButton, {
           size: 'small', type: 'error', secondary: true,
           onClick: () => deleteUser(row.id)
@@ -150,6 +161,7 @@ const columns = [
     }
   }
 ]
+
 
 const fetchUsers = async () => {
   try {
@@ -225,6 +237,11 @@ const deleteUser = (id) => {
   })
 }
 
+const viewPrescriptions = (id) => {
+  router.push(`/dashboard/doctors/${id}/prescriptions`)
+
+}
+
 const resetAddUserForm = () => {
   newUser.value = {
     name: '',
@@ -281,5 +298,14 @@ onMounted(fetchUsers)
 }
 .font-bold {
   font-weight: bold;
+}
+
+/* Make table scrollable horizontally on small screens */
+.table-responsive {
+  overflow-x: auto;
+  width: 100%;
+}
+.table-responsive ::v-deep(.n-data-table) {
+  min-width: 600px;
 }
 </style>

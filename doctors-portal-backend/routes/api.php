@@ -15,9 +15,15 @@ use App\Models\User;
 
 use Illuminate\Support\Facades\Auth;
 use Laravel\Passport\PersonalAccessTokenResult;
+use App\Http\Controllers\PrescriptionController;
+use App\Http\Controllers\ShipmentUpdateController;
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
+
+Route::middleware(['auth:api', 'role:super_admin'])->group(function () {
+    Route::get('users/admins', [UserController::class, 'admins']);
+});
 
 Route::middleware('auth:api')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
@@ -36,6 +42,7 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/caretend-credential', [CaretendCredentialController::class, 'update']);
     Route::delete('/caretend-credential', [CaretendCredentialController::class, 'destroy']);
 });
+
 
 
 Route::post('/email/verification-notification', function (Request $request) {
@@ -106,3 +113,26 @@ Route::post('/verify-2fa', function (Request $request) {
 
 
 Route::post('/resend-2fa', [AuthController::class, 'resend2fa']);
+
+Route::middleware('auth:api')->group(function () {
+    Route::get('prescriptions', [PrescriptionController::class, 'index']);
+    Route::get('shipment-updates', [ShipmentUpdateController::class, 'index']);
+    Route::post('shipment-updates/save', [ShipmentUpdateController::class, 'store']);
+    Route::put('shipment-updates/{id}', [ShipmentUpdateController::class, 'update']);
+    Route::post('/shipment-updates', [ShipmentUpdateController::class, 'create']);
+});
+
+Route::middleware('auth:api')->get('shipment-updates/doctor/{id}', function ($id) {
+    $user = auth()->user();
+
+    if (!$user->hasAnyRole(['super_admin', 'admin'])) {
+        return response()->json(['message' => 'Forbidden'], 403);
+    }
+
+    return app(\App\Http\Controllers\ShipmentUpdateController::class)->getByUser($id);
+});
+
+
+
+
+

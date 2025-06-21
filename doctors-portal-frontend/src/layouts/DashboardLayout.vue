@@ -1,15 +1,18 @@
 <template>
   <n-layout has-sider class="full-height-layout">
-    <n-layout-sider
-      class="full-height-layout"
-      bordered
-      collapse-mode="width"
-      :collapsed-width="64"
-      :width="240"
-      show-trigger
-      v-model:collapsed="isCollapsed"
-      style="position: relative;"
-    >
+   <n-layout-sider
+    class="full-height-layout"
+    bordered
+    collapse-mode="width"
+    :collapsed-width="64"
+    :width="240"
+    :show-trigger="!isMobile"
+    :collapsed="isCollapsed"
+    @update:collapsed="handleCollapse"
+    style="position: relative;"
+  >
+
+
       <img
         v-if="!isCollapsed"
         src="https://deliveritpharmacy.com/wp-content/uploads/2024/04/Logo-Resurrgaction-B-Vertical.png"
@@ -24,13 +27,14 @@
         class="logo-img"
         style="width: 40px; margin: 12px auto; display: block;"
       />
-          
+
       <n-menu
-      :value="activeKey"
-      :options="menuOptions"
-      @update:value="handleMenuSelect"
-      :theme-overrides="menuThemeOverrides"
+        :value="activeKey"
+        :options="menuOptions"
+        @update:value="handleMenuSelect"
+        :theme-overrides="menuThemeOverrides"
       />
+
       <!-- Partnerships section pinned to bottom -->
       <div
         v-if="!isCollapsed"
@@ -64,35 +68,56 @@
             />
           </a>
         </div>
-
       </div>
-
-
     </n-layout-sider>
 
     <n-layout>
       <n-layout-content content-style="height: calc(100vh - var(--header-height));">
         <router-view />
       </n-layout-content>
-
     </n-layout>
   </n-layout>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { h } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, h } from 'vue'
 import { NIcon, useMessage } from 'naive-ui'
-import { RouterLink, useRouter, useRoute } from 'vue-router'
-import { BookOutline, PersonOutline, PeopleOutline, LogOutOutline, SettingsOutline, DocumentTextOutline } from '@vicons/ionicons5'
+import { useRouter, useRoute } from 'vue-router'
+import {
+  BookOutline, PersonOutline, PeopleOutline,
+  LogOutOutline, SettingsOutline, DocumentTextOutline
+} from '@vicons/ionicons5'
 import axios from '@/api/axios'
 import { useUserStore } from '@/stores/useUser'
 
 const userStore = useUserStore()
-const isCollapsed = ref(false)
-
 const router = useRouter()
 const route = useRoute()
+
+const isCollapsed = ref(false)
+const isMobile = ref(false)
+
+const checkMobile = () => {
+  isMobile.value = window.innerWidth < 768
+  if (isMobile.value) {
+    isCollapsed.value = true
+  }
+}
+function handleCollapse(val) {
+  if (!isMobile.value) {
+    isCollapsed.value = val
+  }
+}
+
+
+onMounted(() => {
+  checkMobile()
+  window.addEventListener('resize', checkMobile)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', checkMobile)
+})
 
 const adminMenu = [
   {
@@ -145,7 +170,7 @@ const userMenu = [
     key: 'referral',
     icon: renderIcon(DocumentTextOutline),
     path: 'https://deliveritpharmacy.com/referral-forms/',
-    target: '_blank' // optional: opens in a new tab
+    target: '_blank'
   },
   {
     label: 'Logout',
@@ -154,7 +179,6 @@ const userMenu = [
     icon: renderIcon(LogOutOutline)
   }
 ]
-
 
 const menuOptions = computed(() =>
   userStore.isAdmin() ? adminMenu : userMenu
@@ -178,12 +202,10 @@ function handleMenuSelect(key) {
 
 const activeKey = ref(getActiveKeyFromRoute(route.path))
 
-// Auto update active key when route changes
 router.afterEach((to) => {
   activeKey.value = getActiveKeyFromRoute(to.path)
 })
 
-// Helper to extract the key from the current route
 function getActiveKeyFromRoute(path) {
   if (path === '/dashboard') return 'dashboard'
   if (path.includes('/doctors')) return 'doctors'
@@ -192,39 +214,34 @@ function getActiveKeyFromRoute(path) {
   return ''
 }
 
-
-
-// Define your theme overrides here
 const menuThemeOverrides = {
-  itemColorActive: '#2080f0',            // Background when active
-  itemTextColorActive: '#ffffff',         // Text color when active
-  itemIconColorActive: '#ffffff',         // Icon color when active
-  itemColorHover: '#4098fc',              // Background when hovering (not active)
-  itemTextColorHover: '#ffffff',          // Text color when hovering
-  itemIconColorHover: '#ffffff',          // Icon color when hovering
-  itemColorActiveHover: '#2080f0',        // 🔥 Background stay same while hover active
-  itemTextColorActiveHover: '#ffffff',    // 🔥 Text stay white while hovering active
-  itemIconColorActiveHover: '#ffffff',    // 🔥 Icon stay white while hovering active
-  itemColorActiveCollapsed: '#2080f0',      // 🔥 Active background when collapsed
-  itemTextColorActiveCollapsed: '#ffffff',  // 🔥 Text color when collapsed and active
+  itemColorActive: '#2080f0',
+  itemTextColorActive: '#ffffff',
+  itemIconColorActive: '#ffffff',
+  itemColorHover: '#4098fc',
+  itemTextColorHover: '#ffffff',
+  itemIconColorHover: '#ffffff',
+  itemColorActiveHover: '#2080f0',
+  itemTextColorActiveHover: '#ffffff',
+  itemIconColorActiveHover: '#ffffff',
+  itemColorActiveCollapsed: '#2080f0',
+  itemTextColorActiveCollapsed: '#ffffff',
 }
 
 const message = useMessage()
 
 const logout = async () => {
   try {
-    await axios.post('/logout'); // 👈 Call your Laravel logout route
-    localStorage.removeItem('access_token'); // Clear token
-    userStore.clearUser() // 👈 reset user
-    message.success('Logged out successfully');
-    router.push('/'); // Redirect to login page
-    return;
+    await axios.post('/logout')
+    localStorage.removeItem('access_token')
+    userStore.clearUser()
+    message.success('Logged out successfully')
+    router.push('/')
   } catch (error) {
-    console.error('Logout failed', error?.response?.data || error.message);
-    message.error('Failed to logout');
+    console.error('Logout failed', error?.response?.data || error.message)
+    message.error('Failed to logout')
   }
 }
-
 </script>
 
 <style scoped>

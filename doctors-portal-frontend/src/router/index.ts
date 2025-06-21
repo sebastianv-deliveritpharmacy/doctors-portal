@@ -30,6 +30,11 @@ const routes: RouteRecordRaw[] = [
         name: 'Profile',
         component: () => import('@/views/DashboardProfile.vue')
       },
+       {
+        path: 'users',
+        name: 'Users',
+        component: () => import('@/views/DashboardAllUsers.vue')
+      },
       {
         path: 'doctors',
         name: 'Doctors',
@@ -42,7 +47,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/DashboardSettings.vue'),
         meta: { requiresAdmin: true } // 🔐 Only for admins
 
-      }
+      },
+      {
+        path: 'doctors/:id/prescriptions',
+        component: () => import('@/views/DoctorPrescriptionsView.vue'),
+        meta: { requiresAdmin: true } // 🔐 Only for admins
+      } 
     ]
     
   },

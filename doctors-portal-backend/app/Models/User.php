@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\URL;
+use Spatie\Permission\Traits\HasRoles;
 
 use App\Mail\VerifyEmailCustom;
 use Illuminate\Support\Facades\Mail;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Mail;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -39,6 +40,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'remember_token',
     ];
+    protected $guard_name = 'api';
+
+
 
     /**
      * Get the attributes that should be cast.
