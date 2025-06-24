@@ -10,6 +10,6 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(naive)
 app.use(router)  // Using router directly
-app.use(VueApexCharts)  
+app.use(VueApexCharts as any)
 
 app.mount('#app')
