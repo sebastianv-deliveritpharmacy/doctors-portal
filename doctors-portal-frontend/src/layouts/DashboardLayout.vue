@@ -13,20 +13,23 @@
   >
 
 
-      <img
-        v-if="!isCollapsed"
-        src="https://deliveritpharmacy.com/wp-content/uploads/2024/04/Logo-Resurrgaction-B-Vertical.png"
-        alt="Deliverit Logo"
-        class="logo-img"
-        style="width: 120px; margin: 20px;"
-      />
-      <img
-        v-else
-        src="https://deliveritpharmacy.com/wp-content/uploads/2024/04/DPIC-emblem.png"
-        alt="Deliverit Emblem"
-        class="logo-img"
-        style="width: 40px; margin: 12px auto; display: block;"
-      />
+      <router-link to="/">
+        <img
+          v-if="!isCollapsed"
+          src="https://deliveritpharmacy.com/wp-content/uploads/2024/04/Logo-Resurrgaction-B-Vertical.png"
+          alt="Deliverit Logo"
+          class="logo-img"
+          style="width: 120px; margin: 20px;"
+        />
+        <img
+          v-else
+          src="https://deliveritpharmacy.com/wp-content/uploads/2024/04/DPIC-emblem.png"
+          alt="Deliverit Emblem"
+          class="logo-img"
+          style="width: 40px; margin: 12px auto; display: block;"
+        />
+    </router-link>
+
 
       <n-menu
         :value="activeKey"
@@ -85,7 +88,7 @@ import { NIcon, useMessage } from 'naive-ui'
 import { useRouter, useRoute } from 'vue-router'
 import {
   BookOutline, PersonOutline, PeopleOutline,
-  LogOutOutline, SettingsOutline, DocumentTextOutline
+  LogOutOutline, SettingsOutline, DocumentTextOutline, PeopleCircleOutline
 } from '@vicons/ionicons5'
 import axios from '@/api/axios'
 import { useUserStore } from '@/stores/useUser'
@@ -118,6 +121,45 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', checkMobile)
 })
+
+const superAdminMenu = [
+  {
+    label: 'Dashboard',
+    key: 'dashboard',
+    to: '/dashboard',
+    icon: renderIcon(BookOutline)
+  },
+   {
+    label: 'Admins',
+    key: 'admins',
+    to: '/dashboard/admins',
+    icon: renderIcon(PeopleOutline)
+  },
+  {
+    label: 'Doctors',
+    key: 'doctors',
+    to: '/dashboard/doctors',
+    icon: renderIcon(PeopleCircleOutline)
+  },
+  {
+    label: 'Profile',
+    key: 'profile',
+    to: '/dashboard/profile',
+    icon: renderIcon(PersonOutline)
+  },
+  {
+    label: 'Settings',
+    key: 'settings',
+    to: '/dashboard/settings',
+    icon: renderIcon(SettingsOutline)
+  },
+  {
+    label: 'Logout',
+    key: 'logout',
+    to: '/logout',
+    icon: renderIcon(LogOutOutline)
+  }
+]
 
 const adminMenu = [
   {
@@ -180,9 +222,12 @@ const userMenu = [
   }
 ]
 
-const menuOptions = computed(() =>
-  userStore.isAdmin() ? adminMenu : userMenu
-)
+
+const menuOptions = computed(() => {
+  if (userStore.isSuperAdmin()) return superAdminMenu
+  if (userStore.isAdmin()) return adminMenu
+  return userMenu
+})
 
 function renderIcon(icon) {
   return () => h(NIcon, null, { default: () => h(icon) })
@@ -211,6 +256,7 @@ function getActiveKeyFromRoute(path) {
   if (path.includes('/doctors')) return 'doctors'
   if (path.includes('/settings')) return 'settings'
   if (path.includes('/profile')) return 'profile'
+  if (path.includes('/admins')) return 'admins'
   return ''
 }
 

@@ -30,7 +30,7 @@
         <n-space vertical :size="24">
           <div style="display: flex; justify-content: space-between;">
             <n-checkbox v-model:checked="rememberMe">Remember me</n-checkbox>
-            <n-button text @click="handleForgotPassword">
+            <n-button text @click="router.push('/forgot-password')">
               Forgot password?
             </n-button>
           </div>

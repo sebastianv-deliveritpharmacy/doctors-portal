@@ -36,13 +36,12 @@
               Add Prescription
             </n-button>
           </n-space>
-          
         </n-space>
 
         <div class="table-responsive">
           <n-data-table
             :columns="columns"
-            :data="paginatedData"
+            :data="prescriptions"
             :bordered="true"
             :loading="isLoading"
           />
@@ -52,10 +51,11 @@
           <n-pagination
             v-model:page="currentPage"
             :page-size="pageSize"
-            :item-count="filteredData.length"
+            :item-count="totalItems"
             show-size-picker
             :page-sizes="[5, 10, 20]"
-            @update:page-size="size => { pageSize = size; currentPage = 1 }"
+            @update:page-size="size => { pageSize = size; currentPage = 1; getPrescriptions() }"
+            @update:page="page => { currentPage = page; getPrescriptions() }"
           />
         </n-space>
       </n-card>
@@ -135,7 +135,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, h } from 'vue'
+import { ref, onMounted, computed, h, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   NCard, NStatistic, NSpace, useMessage,
@@ -152,6 +152,7 @@ const message = useMessage()
 const doctorId = route.params.id
 const doctorName = ref('Doctor')
 const prescriptions = ref([])
+const totalItems = ref(0)
 
 const showAddEditModal = ref(false)
 const editingPrescription = ref({
@@ -168,6 +169,13 @@ const editingPrescription = ref({
 
 const isLoading = ref(false)
 
+const searchTerm = ref('')
+const currentPage = ref(1)
+const pageSize = ref(10)
+
+watch([searchTerm, currentPage, pageSize], () => {
+  getPrescriptions()
+})
 
 const statusOptions = [
   { label: 'Confirmed Prescription Received', value: 'confirmed_prescription_received' },
@@ -179,7 +187,6 @@ const statusOptions = [
   { label: 'Collecting Co-pay', value: 'collecting_copay' },
   { label: 'Delivery Confirmation', value: 'delivery_confirmation' }
 ]
-
 
 const openAddModal = () => {
   editingPrescription.value = {
@@ -213,7 +220,6 @@ const savePrescription = async () => {
       return
     }
 
-
     const payload = {
       user_id: doctorId,
       patient_name: editingPrescription.value.patient_name,
@@ -245,30 +251,19 @@ const savePrescription = async () => {
   }
 }
 
-// Helper function to format dates
 function formatDateForBackend(timestamp) {
   const date = new Date(timestamp)
   const pad = (n) => n.toString().padStart(2, '0')
-
-  const year = date.getFullYear()
-  const month = pad(date.getMonth() + 1)
-  const day = pad(date.getDate())
-  const hours = pad(date.getHours())
-  const minutes = pad(date.getMinutes())
-  const seconds = pad(date.getSeconds())
-
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
 }
-
-
 
 const getPrescriptions = async () => {
   try {
     isLoading.value = true
-    const response = await fetchShipmentsByDoctor(doctorId)
+    const response = await fetchShipmentsByDoctor(doctorId, currentPage.value, pageSize.value, searchTerm.value)
     doctorName.value = response.doctorName || 'Doctor'
-    prescriptions.value = response.data.map((item, index) => ({
-      id: item.id || index + 1,
+    prescriptions.value = response.data.data.map(item => ({
+      id: item.id,
       name: item.prescription_name || '-',
       status: item.status || 'unknown',
       date_shipped: item.date_shipped ? new Date(item.date_shipped).getTime() : null,
@@ -277,6 +272,7 @@ const getPrescriptions = async () => {
       shipment_id: item.shipment_id || '-',
       rx_number: item.rx_number || '-'
     }))
+    totalItems.value = response.data.total
   } catch (err) {
     console.error('Error fetching shipments:', err)
     message.error('Unable to load shipment updates.')
@@ -285,26 +281,7 @@ const getPrescriptions = async () => {
   }
 }
 
-
 onMounted(getPrescriptions)
-
-const searchTerm = ref('')
-const currentPage = ref(1)
-const pageSize = ref(5)
-
-const filteredData = computed(() => {
-  if (!searchTerm.value) return prescriptions.value
-  return prescriptions.value.filter(p =>
-    p.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-    p.patient_name.toLowerCase().includes(searchTerm.value.toLowerCase())
-  )
-})
-
-const paginatedData = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  const end = start + pageSize.value
-  return filteredData.value.slice(start, end)
-})
 
 const columns = [
   { title: 'ID', key: 'id' },
@@ -325,7 +302,6 @@ const columns = [
         collecting_copay: 'warning',
         delivery_confirmation: 'success'
       }
-
       const labels = {
         confirmed_prescription_received: 'Confirmed Prescription Received',
         data_entry: 'Data Entry',
@@ -336,44 +312,35 @@ const columns = [
         collecting_copay: 'Collecting Co-pay',
         delivery_confirmation: 'Delivery Confirmation'
       }
-
       const type = statusMap[row.status] || 'default'
       const label = labels[row.status] || row.status
-
       return h(NTag, { type }, { default: () => label })
     }
   },
   {
-  title: 'Shipped At',
-  key: 'date_shipped',
-  render: (row) => row.date_shipped
-    ? new Date(row.date_shipped).toLocaleString()
-    : '—'
-},
-{
-  title: 'Delivered At',
-  key: 'delivered_at',
-  render: (row) => row.delivered_at
-    ? new Date(row.delivered_at).toLocaleString()
-    : '—'
-},
+    title: 'Shipped At',
+    key: 'date_shipped',
+    render: (row) => row.date_shipped ? new Date(row.date_shipped).toLocaleString() : '—'
+  },
+  {
+    title: 'Delivered At',
+    key: 'delivered_at',
+    render: (row) => row.delivered_at ? new Date(row.delivered_at).toLocaleString() : '—'
+  },
   {
     title: 'Actions',
     key: 'actions',
-    render: (row) => {
-      return h('div', { style: 'display: flex; gap: 8px;' }, [
-        h(NButton, {
-          size: 'small',
-          type: 'info',
-          secondary: true,
-          onClick: () => openEditModal(row)
-        }, { default: () => 'Edit' })
-      ])
-    }
+    render: (row) => h('div', { style: 'display: flex; gap: 8px;' }, [
+      h(NButton, {
+        size: 'small',
+        type: 'info',
+        secondary: true,
+        onClick: () => openEditModal(row)
+      }, { default: () => 'Edit' })
+    ])
   }
 ]
 </script>
-
 
 <style scoped>
 .dashboard-container {

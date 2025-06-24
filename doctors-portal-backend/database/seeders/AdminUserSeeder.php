@@ -18,7 +18,6 @@ class AdminUserSeeder extends Seeder
             'name' => 'Sebastian',
             'email' => 'sebastian.v@deliveritpharmacy.com',
             'password' => Hash::make('Hailtotheking!1'),
-            'is_admin' => true,
         ]);
     }
 }

@@ -29,3 +29,7 @@ Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) 
 })->middleware('signed')->name('verification.verify');
 
 
+Route::get('/reset-password/{token}', function ($token) {
+    return redirect()->away("http://localhost:5173/reset-password/$token");
+})->middleware('guest')->name('password.reset');
+

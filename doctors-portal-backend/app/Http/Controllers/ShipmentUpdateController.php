@@ -10,10 +10,22 @@ use Illuminate\Support\Facades\Log;
 
 class ShipmentUpdateController extends Controller
 {
-    public function index(Request $request, CareTendService $careTend)
+    public function index(Request $request)
     {
-        return response()->json(ShipmentUpdate::all());
+        $query = ShipmentUpdate::query();
+
+        // If a search term is present, apply filters
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('patient_name', 'like', "%{$search}%")
+                ->orWhere('prescription_name', 'like', "%{$search}%");
+            });
+        }
+
+        return response()->json($query->paginate($request->input('per_page', 20)));
     }
+
+
 
     public function store(Request $request, CareTendService $svc)
     {
@@ -48,18 +60,33 @@ class ShipmentUpdateController extends Controller
 
 
     // ✅ Get prescriptions for a specific doctor (user)
-    public function getByUser($userId)
+  public function getByUser($userId, Request $request)
     {
-        $updates = ShipmentUpdate::where('user_id', $userId)->get();
+        $perPage = $request->input('per_page', 20);
+        $search = $request->input('search');
+
+        $query = ShipmentUpdate::where('user_id', $userId);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('patient_name', 'like', '%' . $search . '%')
+                ->orWhere('prescription_name', 'like', '%' . $search . '%');
+            });
+        }
+
+        $updates = $query->paginate($perPage);
+
         return response()->json($updates);
     }
+
+
 
     // ✅ Update a prescription (shipment update)
     public function update(Request $request, $id)
     {
         $update = ShipmentUpdate::findOrFail($id);
 
-Log::info('This is a debug log for request', ['data' => $request]);
+        Log::info('This is a debug log for request', ['data' => $request]);
 
 
         $data = $request->validate([

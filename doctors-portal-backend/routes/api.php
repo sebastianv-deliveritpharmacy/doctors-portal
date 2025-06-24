@@ -17,12 +17,18 @@ use Illuminate\Support\Facades\Auth;
 use Laravel\Passport\PersonalAccessTokenResult;
 use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\ShipmentUpdateController;
+use App\Http\Controllers\DashboardController;
+
+
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
+Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail']);
+Route::post('/reset-password', [AuthController::class, 'reset']);
 
 Route::middleware(['auth:api', 'role:super_admin'])->group(function () {
     Route::get('users/admins', [UserController::class, 'admins']);
+    Route::post('users/admins', [UserController::class, 'createAdmin']);
 });
 
 Route::middleware('auth:api')->group(function () {
@@ -105,9 +111,11 @@ Route::post('/verify-2fa', function (Request $request) {
     Auth::login($user);
     $tokenResult = $user->createToken('LoginToken');
 
+   
     return response()->json([
         'token' => $tokenResult->accessToken,
         'user' => $user,
+        'role' => $user->roles->pluck('name')->first() // Just return the first role name
     ]);
 });
 
@@ -120,17 +128,20 @@ Route::middleware('auth:api')->group(function () {
     Route::post('shipment-updates/save', [ShipmentUpdateController::class, 'store']);
     Route::put('shipment-updates/{id}', [ShipmentUpdateController::class, 'update']);
     Route::post('/shipment-updates', [ShipmentUpdateController::class, 'create']);
+    Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+
 });
 
-Route::middleware('auth:api')->get('shipment-updates/doctor/{id}', function ($id) {
+Route::middleware('auth:api')->get('shipment-updates/doctor/{id}', function ($id, Request $request) {
     $user = auth()->user();
 
     if (!$user->hasAnyRole(['super_admin', 'admin'])) {
         return response()->json(['message' => 'Forbidden'], 403);
     }
 
-    return app(\App\Http\Controllers\ShipmentUpdateController::class)->getByUser($id);
+    return app(\App\Http\Controllers\ShipmentUpdateController::class)->getByUser($id, $request);
 });
+
 
 
 

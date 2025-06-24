@@ -16,16 +16,20 @@ export const useUserStore = defineStore('user', {
       user: user as null | {
         name: string
         email: string
-        is_admin: number
+        role: string
       }
     }
   },
 
   actions: {
-    setUser(userData: any) {
-      this.user = userData
-      localStorage.setItem('user', JSON.stringify(userData))
-    },
+   setUser(userData: any) {
+    const roleName = userData.roles?.[0]?.name || null
+    this.user = {
+      ...userData,
+      role: roleName
+    }
+    localStorage.setItem('user', JSON.stringify(this.user))
+  },
 
     clearUser() {
       this.user = null
@@ -33,7 +37,11 @@ export const useUserStore = defineStore('user', {
     },
 
     isAdmin() {
-      return this.user?.is_admin == 1
+      return this.user?.role === 'admin' || this.user?.role === 'super_admin'
+    },
+
+    isSuperAdmin() {
+      return this.user?.role === 'super_admin'
     }
   }
 })

@@ -13,11 +13,12 @@ use Spatie\Permission\Traits\HasRoles;
 
 use App\Mail\VerifyEmailCustom;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -72,5 +73,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
         Mail::to($this->email)->send(new VerifyEmailCustom($this, $verificationUrl));
     }
+
+    public function shipmentUpdates()
+    {
+        return $this->hasMany(ShipmentUpdate::class, 'user_id');
+    }
+
 
 }

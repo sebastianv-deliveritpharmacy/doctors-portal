@@ -31,15 +31,16 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/DashboardProfile.vue')
       },
        {
-        path: 'users',
-        name: 'Users',
-        component: () => import('@/views/DashboardAllUsers.vue')
+        path: 'admins',
+        name: 'Admins',
+        component: () => import('@/views/DashboardAllUsers.vue'),
+        meta: { requiresSuperAdmin: true } // 🔐 Only for super admins
       },
       {
         path: 'doctors',
         name: 'Doctors',
         component: () => import('@/views/DashboardDoctors.vue'),
-        meta: { requiresAdmin: true } // 🔐 Only for admins
+        meta: { requiresAdmin: true }
       },
       {
         path: 'settings',
@@ -66,6 +67,16 @@ const routes: RouteRecordRaw[] = [
     name: 'Verify 2FA',
     component: () => import('@/views/Verify2Fa.vue'),
   },
+  {
+    path: '/forgot-password',
+    name: 'Forgot Password',
+    component: () => import('@/views/ForgotPassword.vue'),
+  },
+  {
+    path: '/reset-password/:token',
+    name: 'Reseet Password',
+    component: () => import('@/views/ResetPasswordPage.vue'),
+  },
 ]
 
 const router = createRouter({
@@ -79,23 +90,33 @@ router.beforeEach(async (to, _from, next) => {
   const userStore = useUserStore()
 
   if (to.meta.requiresAuth) {
-    if (!token) {
-      return next('/login')
-    }
+    if (!token) return next('/login')
 
-    // Fetch user if not already in store
     if (!userStore.user) {
       try {
-        // await userStore.fetchUser() // or userStore.setUser() depending on your store
+        const raw = localStorage.getItem('user')
+        const userData = raw && raw !== 'undefined' ? JSON.parse(raw) : null
+        if (!userData) throw new Error('No user')
+        userStore.setUser(userData)
       } catch (err) {
         localStorage.removeItem('access_token')
         return next('/login')
       }
     }
+
+    if (to.meta.requiresSuperAdmin && !userStore.isSuperAdmin()) {
+      return next('/dashboard') // or show 403
+    }
+
+    if (to.meta.requiresAdmin && !userStore.isAdmin()) {
+      return next('/dashboard') // or show 403
+    }
   }
 
   next()
 })
+
+
 
 
 

@@ -42,7 +42,7 @@
       style="width: 500px;"
     >
       <template #header>
-        <h2 class="text-lg font-bold m-0">{{ editingUserId ? 'Edit User' : 'Add New User' }}</h2>
+        <h2 class="text-lg font-bold m-0">{{ editingUserId ? 'Edit User' : 'Add New Admin' }}</h2>
       </template>
 
       <n-form
@@ -122,7 +122,7 @@ const rules = {
     { type: 'email', message: 'Invalid email', trigger: ['input', 'blur'] }
   ],
   password: [
-    { required: true, min: 6, message: 'Password must be at least 6 characters', trigger: ['input', 'blur'] }
+    { required: false, min: 6, message: 'Password must be at least 6 characters', trigger: ['input', 'blur'] }
   ],
   password_confirmation: [
     {
@@ -185,7 +185,7 @@ const submitAddUser = async () => {
       await axios.put(`/users/${editingUserId.value}`, payload)
       message.success('User updated successfully!')
     } else {
-      await axios.post('/users', payload)
+      await axios.post('/users/admins', payload)
       message.success('User added successfully!')
     }
 

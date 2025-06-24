@@ -29,30 +29,19 @@
             </n-icon>
           </n-button>
 
-          <!-- Slideshow -->
-          <div class="slideshow-wrapper">
-                <Transition
-                  mode="in-out"
-                  enter-active-class="fade-zoom-enter-active"
-                  leave-active-class="fade-zoom-leave-active"
-                  enter-from-class="fade-zoom-enter-from"
-                  leave-to-class="fade-zoom-leave-to"
-                >
-                  <img
-                    v-if="showFirst"
-                    key="image-1"
-                    src="./../assets/doctor-porta.png"
-                    class="transitioned-image"
-                  />
-                  <img
-                    v-else
-                    key="image-2"
-                    src="./../assets/admin-portal.png"
-                    class="transitioned-image"
-                  />
-                </Transition>
-
+          <!-- Video Section -->
+          <div class="video-wrapper">
+            <video
+              class="intro-video"
+              controls
+              playsinline
+              poster="../assets/dashboard-pic.png"
+            >
+              <source src="../assets/intro_video.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
           </div>
+
           
 
           <!-- Features -->
@@ -470,6 +459,25 @@ div.n-layout-scroll-container {
 
 :deep(.n-collapse-item) {
   transition: background-color 0.3s ease;
+}
+
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1300px;
+  height: 600px;
+  margin: 80px auto;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.intro-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
 }
 
 

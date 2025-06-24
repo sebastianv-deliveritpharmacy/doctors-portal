@@ -167,7 +167,7 @@ const fetchUsers = async () => {
   try {
     loading.value = true
     const response = await axios.get('/users')
-    users.value = response.data.filter(user => user.is_admin === 0)
+    users.value = response.data
   } catch (error) {
     message.error('Failed to load users')
   } finally {

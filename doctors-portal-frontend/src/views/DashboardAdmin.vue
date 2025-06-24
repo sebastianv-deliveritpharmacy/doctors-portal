@@ -5,46 +5,44 @@
       <div class="subtext">Track your activity and progress below.</div>
       <div class="stats-overview">
         <div v-for="card in cards" :key="card.title" class="stat-card">
-        <div class="card-top">
-          <div>
-            <div class="stat-title">{{ card.title }}</div>
-            <div class="stat-value">{{ card.value }}</div>
-            <div
-              class="stat-change"
-              :class="{
-                positive: card.change > 0,
-                negative: card.change < 0,
-                neutral: card.change === 0
-              }"
-            >
-              {{ card.change > 0 ? '↑' : card.change < 0 ? '↓' : '+' }}
-              {{ Math.abs(card.change).toFixed(2) }}%
+          <div class="card-top">
+            <div>
+              <div class="stat-title">{{ card.title }}</div>
+              <div class="stat-value">{{ card.value }}</div>
+              <div
+                class="stat-change"
+                :class="{
+                  positive: card.change > 0,
+                  negative: card.change < 0,
+                  neutral: card.change === 0
+                }"
+              >
+                {{ card.change > 0 ? '↑' : card.change < 0 ? '↓' : '+' }}
+                {{ Math.abs(card.change).toFixed(2) }}%
+              </div>
+            </div>
+            <div class="stat-icon" :style="{ backgroundColor: card.iconBg }">
+              <svg
+                v-if="card.icon === 'checkmark'"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="white"
+                viewBox="0 0 24 24"
+                width="20"
+                height="20"
+              >
+                <path d="M9 16.17l-3.88-3.88L4 13.41l5 5 9-9-1.41-1.41z" />
+              </svg>
+              <component v-else :is="card.icon" class="icon" />
             </div>
           </div>
-          <div class="stat-icon" :style="{ backgroundColor: card.iconBg }">
-            <svg
-              v-if="card.icon === 'checkmark'"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="white"
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-            >
-              <path d="M9 16.17l-3.88-3.88L4 13.41l5 5 9-9-1.41-1.41z" />
-            </svg>
-            <component v-else :is="card.icon" class="icon" />
-          </div>
+          <a :href="card.link" class="stat-link">{{ card.linkText }}</a>
         </div>
-        <a :href="card.link" class="stat-link">{{ card.linkText }}</a>
-      </div>
       </div>
     </div>
 
-   
-
     <div class="chart-card">
       <ChartComponent />
-      <PieChart/>
+      <PieChart />
     </div>
   </div>
 </template>
@@ -53,16 +51,17 @@
 import { ref, onMounted } from 'vue'
 import { DollarSign, ShoppingBag, Users, CreditCard } from 'lucide-vue-next'
 import ChartComponent from '@/components/ChartComponent.vue'
-import PieChart from '@/components/PieChart.vue';
+import PieChart from '@/components/PieChart.vue'
 import { getCurrentUser } from '@/api/user'
+import { fetchDashboardStats } from '@/api/dashboard'
 
 const user = ref({ name: '', email: '' })
 
 const cards = ref([
   {
     title: 'Active Doctors',
-    value: 8,
-    change: 12.5,
+    value: 0,
+    change: 0,
     icon: Users,
     iconBg: '#00B140',
     link: '#',
@@ -70,8 +69,8 @@ const cards = ref([
   },
   {
     title: 'Prescriptions Today',
-    value: 31,
-    change: 8.2,
+    value: 0,
+    change: 0,
     icon: ShoppingBag,
     iconBg: '#0073e6',
     link: '#',
@@ -79,8 +78,8 @@ const cards = ref([
   },
   {
     title: 'Completed Today',
-    value: 12,
-    change: -3.4,
+    value: 0,
+    change: 0,
     icon: 'checkmark',
     iconBg: '#f59e0b',
     link: '#',
@@ -88,7 +87,7 @@ const cards = ref([
   },
   {
     title: 'This Month',
-    value: 120,
+    value: 0,
     change: 0,
     icon: CreditCard,
     iconBg: '#9b59b6',
@@ -106,9 +105,29 @@ const getUser = async () => {
   }
 }
 
+const loadDashboardStats = async () => {
+  try {
+    const res = await fetchDashboardStats()
+    const stats = res.data
+    cards.value[0].value = stats.active_doctors.count
+    cards.value[0].change = stats.active_doctors.change
+    cards.value[1].value = stats.prescriptions_today.count
+    cards.value[1].change = stats.prescriptions_today.change
+    cards.value[2].value = stats.completed_today.count
+    cards.value[2].change = stats.completed_today.change
+    cards.value[3].value = stats.this_month.count
+    cards.value[3].change = stats.this_month.change
+  } catch (err) {
+    console.error('Failed to load dashboard stats', err)
+  }
+}
+
 onMounted(() => {
   const token = localStorage.getItem('access_token')
-  if (token) getUser()
+  if (token) {
+    getUser()
+    loadDashboardStats()
+  }
 })
 </script>
 

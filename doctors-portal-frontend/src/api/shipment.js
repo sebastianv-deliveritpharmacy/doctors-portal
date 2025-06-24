@@ -1,10 +1,25 @@
 import axios from './axios'
 
-export const fetchShipments = () => axios.get('/shipment-updates');
-
-export const fetchShipmentsByDoctor = (doctorId) => {
-  return axios.get(`/shipment-updates/doctor/${doctorId}`)
+export const fetchShipments = (page = 1, perPage = 20, search = '') => {
+  return axios.get('/shipment-updates', {
+    params: {
+      page,
+      per_page: perPage,
+      search
+    }
+  })
 }
+
+export const fetchShipmentsByDoctor = (doctorId, page = 1, perPage = 20, search = '') => {
+  return axios.get(`/shipment-updates/doctor/${doctorId}`, {
+    params: {
+      page,
+      per_page: perPage,
+      search
+    }
+  })
+}
+
 
 export const updateShipment = (id, data) => {
   return axios.put(`/shipment-updates/${id}`, data)

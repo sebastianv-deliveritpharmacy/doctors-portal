@@ -6,6 +6,8 @@ export const apiRoutes = {
   register: `${BASE_URL}/register`,
   login: `${BASE_URL}/login`,
   logout: `${BASE_URL}/logout`,
+  forgotPassword: `${BASE_URL}/forgot-password`,
+
 
   users: {
     list: `${BASE_URL}/users`,

@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        return User::all();
+        return response()->json(User::role('doctor')->get());
     }
 
     public function store(Request $request)
@@ -28,6 +28,9 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        // Assign the 'admin' role to  the user with the correct guard
+        $user->assignRole('doctor');
 
         // $user->sendEmailVerificationNotification();
 
@@ -66,6 +69,29 @@ class UserController extends Controller
    public function admins()
     {
         return response()->json(User::role('admin')->get());
+    }
+
+    public function createAdmin(Request $request)
+    {
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+
+        // Assign the 'admin' role to the user with the correct guard
+        $user->assignRole('admin');
+
+        return response()->json([
+            'message' => 'Admin user created successfully',
+            'user' => $user
+        ], 201);
     }
 
 
