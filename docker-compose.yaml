@@ -79,7 +79,7 @@ services:
   frontend:
     build:
       context: ./doctors-portal-frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     container_name: doctors-frontend
     ports:
       - "5173:5173"
@@ -87,8 +87,6 @@ services:
       - ./doctors-portal-frontend:/app
     networks:
       - doctors-network
-
-
 
 volumes:
   mysql-data:
