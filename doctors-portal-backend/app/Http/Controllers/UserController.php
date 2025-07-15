@@ -21,19 +21,18 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
+            'sheet_identifier' => 'nullable|string|max:255',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'sheet_identifier' => $request->sheet_identifier,
             'password' => Hash::make($request->password),
         ]);
 
-        // Assign the 'admin' role to  the user with the correct guard
         $user->assignRole('doctor');
-
-        // $user->sendEmailVerificationNotification();
-
+        $user->sendEmailVerificationNotification();
 
         return response()->json($user, 201);
     }
@@ -46,17 +45,22 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'name' => 'sometimes|required',
+            'name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
-            'password' => 'sometimes|required|min:6',
+            'password' => 'sometimes|nullable|min:6',
+            'sheet_identifier' => 'nullable|string|max:255',
         ]);
 
-        $user->update($request->only(['name', 'email']) + [
+        $user->update([
+            'name' => $request->name ?? $user->name,
+            'email' => $request->email ?? $user->email,
+            'sheet_identifier' => $request->sheet_identifier ?? $user->sheet_identifier,
             'password' => $request->password ? Hash::make($request->password) : $user->password,
         ]);
 
         return response()->json($user);
     }
+
 
     public function destroy(User $user)
     {

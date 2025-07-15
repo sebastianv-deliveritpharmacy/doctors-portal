@@ -142,8 +142,4 @@ Route::middleware('auth:api')->get('shipment-updates/doctor/{id}', function ($id
     return app(\App\Http\Controllers\ShipmentUpdateController::class)->getByUser($id, $request);
 });
 
-
-
-
-
-
+Route::post('shipment-updates/import-from-sheet', [ShipmentUpdateController::class, 'importFromSheet']);

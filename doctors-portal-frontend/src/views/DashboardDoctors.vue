@@ -60,6 +60,10 @@
           <n-input v-model:value="newUser.email" placeholder="User email" />
         </n-form-item>
 
+        <n-form-item label="Sheet Identifier" path="sheet">
+          <n-input v-model:value="newUser.sheet_identifier" placeholder="User sheet identifier" />
+        </n-form-item>
+
         <n-form-item label="Password" path="password">
           <n-input
             v-model:value="newUser.password"
@@ -112,27 +116,30 @@ const router = useRouter()
 const newUser = ref({
   name: '',
   email: '',
+  sheet_identifier: '',
   password: '',
   password_confirmation: ''
 })
 
-const rules = {
+const rules = computed(() => ({
   name: [{ required: true, message: 'Name is required', trigger: ['input', 'blur'] }],
   email: [
     { required: true, message: 'Email is required', trigger: ['input', 'blur'] },
     { type: 'email', message: 'Invalid email', trigger: ['input', 'blur'] }
   ],
-  password: [
-    { required: true, min: 6, message: 'Password must be at least 6 characters', trigger: ['input', 'blur'] }
-  ],
-  password_confirmation: [
-    {
-      validator: (rule, value) => value === newUser.value.password,
-      message: 'Passwords do not match',
-      trigger: ['input', 'blur']
-    }
-  ]
-}
+  sheet_identifier: [{ required: true, message: 'The sheet identifier is required', trigger: ['input', 'blur'] }],
+  password: editingUserId.value
+    ? [] // optional on edit
+    : [{ required: true, min: 6, message: 'Password must be at least 6 characters', trigger: ['input', 'blur'] }],
+  password_confirmation: editingUserId.value
+    ? [] // optional on edit
+    : [{
+        validator: (rule, value) => value === newUser.value.password,
+        message: 'Passwords do not match',
+        trigger: ['input', 'blur']
+      }]
+}))
+
 
 const columns = [
   { title: 'Name', key: 'name' },
@@ -183,6 +190,7 @@ const submitAddUser = async () => {
     const payload = {
       name: newUser.value.name,
       email: newUser.value.email,
+      sheet_identifier: newUser.value.sheet_identifier,
       ...(newUser.value.password ? {
         password: newUser.value.password,
         password_confirmation: newUser.value.password_confirmation
@@ -211,6 +219,7 @@ const openEditUserModal = (user) => {
   newUser.value = {
     name: user.name,
     email: user.email,
+    sheet_identifier: user.sheet_identifier,
     password: '',
     password_confirmation: ''
   }
@@ -246,6 +255,7 @@ const resetAddUserForm = () => {
   newUser.value = {
     name: '',
     email: '',
+    sheet_identifier: '',
     password: '',
     password_confirmation: ''
   }

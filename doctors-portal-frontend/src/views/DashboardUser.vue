@@ -10,11 +10,13 @@
           </div>
 
           <div class="greeting-right">
-            <span class="help-title">Need help? Contact us:</span>
-            <ul class="help-list">
-              <li>Phone: <a href="tel:+11231231233">832-939-8137</a></li>
-              <li>Fax: 832 939 8128</li>
-            </ul>
+            <div class="help-container">
+              <span class="help-title">Need help? Contact us:</span>
+              <ul class="help-list">
+                <li>Phone: <a href="tel:+11231231233">832-939-8137</a></li>
+                <li>Fax: 832 939 8128</li>
+              </ul>
+            </div>
           </div>
         </div>
       </n-card>
@@ -30,13 +32,16 @@
           />
         </n-space>
 
-        <div class="table-responsive">
-          <n-data-table
-            :columns="columns"
-            :data="prescriptions"
-            :bordered="true"
-            :loading="isLoading"
-          />
+        <div class="table-container">
+          <div class="table-responsive">
+            <n-data-table
+              :columns="columns"
+              :data="prescriptions"
+              :bordered="true"
+              :loading="isLoading"
+              class="prescription-table"
+            />
+          </div>
         </div>
 
         <n-space justify="end" style="margin-top: 16px">
@@ -49,7 +54,6 @@
             @update:page="getShipments"
             @update:page-size="size => { pageSize = size; currentPage = 1; getShipments(); }"
           />
-
         </n-space>
       </n-card>
     </n-space>
@@ -57,7 +61,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, h, watch } from 'vue'
+import { ref, onMounted, h } from 'vue'
 import {
   NCard, NStatistic, NSpace, useMessage, NDataTable, NTag, NInput, NPagination
 } from 'naive-ui'
@@ -93,11 +97,13 @@ const getShipments = async () => {
       id: item.id,
       name: item.prescription_name || '-',
       status: item.status || 'unknown',
-      date_shipped: item.date_shipped ? new Date(item.date_shipped).getTime() : null,
-      delivered_at: item.delivered_at ? new Date(item.delivered_at).getTime() : null,
       patient_name: item.patient_name || '-',
-      shipment_id: item.shipment_id || '-',
-      rx_number: item.rx_number || '-'
+      date_of_birth: item.date_of_birth || '-',
+      insurance: item.insurance || '-',
+      city: item.city || '-',
+      source: item.source || '-',
+      arrived_to_office_date: item.arrived_to_office_date || '-',
+      shipment_id: item.shipment_id || '-'
     }))
     totalItems.value = response.data.total
   } catch (err) {
@@ -116,75 +122,143 @@ onMounted(() => {
   }
 })
 
-
-watch(searchTerm, () => {
-  currentPage.value = 1
-  getShipments()
-})
-
 const columns = [
-  { title: 'ID', key: 'id' },
-  { title: 'Shipment ID', key: 'shipment_id' },
-  { title: 'Patient', key: 'patient_name' },
-  { title: 'Prescription', key: 'name' },
+  { 
+    title: 'ID', 
+    key: 'id',
+    className: 'hide-on-mobile',
+    width: 80
+  },
+  { 
+    title: 'Patient', 
+    key: 'patient_name',
+    width: 150
+  },
+  { 
+    title: 'Prescription', 
+    key: 'name',
+    width: 150
+  },
+  { 
+    title: 'DOB', 
+    key: 'date_of_birth',
+    className: 'hide-on-mobile',
+    width: 120
+  },
+  { 
+    title: 'Insurance', 
+    key: 'insurance',
+    className: 'hide-on-mobile',
+    width: 150
+  },
+  { 
+    title: 'City', 
+    key: 'city',
+    className: 'hide-on-mobile',
+    width: 120
+  },
+  { 
+    title: 'Source', 
+    key: 'source',
+    className: 'hide-on-mobile',
+    width: 120
+  },
+  { 
+    title: 'Arrived', 
+    key: 'arrived_to_office_date',
+    render: (row) => row.arrived_to_office_date 
+      ? new Date(row.arrived_to_office_date).toLocaleDateString() 
+      : '-',
+    width: 120
+  },
   {
     title: 'Status',
     key: 'status',
     render: (row) => {
-      const statusMap = {
-        confirmed_prescription_received: 'info',
-        data_entry: 'default',
-        intake_processing: 'warning',
-        insurance_verification: 'warning',
-        copay_assistant: 'info',
-        production: 'primary',
-        collecting_copay: 'warning',
-        delivery_confirmation: 'success'
+      const statusConfig = {
+        confirmed_prescription_received: {
+          label: 'Confirmed',
+          color: '#e6f7ff',
+          textColor: '#1890ff'
+        },
+        data_entry: {
+          label: 'Data Entry',
+          color: '#f6ffed',
+          textColor: '#52c41a'
+        },
+        intake_processing: {
+          label: 'Intake',
+          color: '#fff7e6',
+          textColor: '#fa8c16'
+        },
+        insurance_verification: {
+          label: 'Insurance',
+          color: '#fff1f0',
+          textColor: '#f5222d'
+        },
+        copay_assistant: {
+          label: 'Co-pay',
+          color: '#f6faff',
+          textColor: '#096dd9'
+        },
+        production: {
+          label: 'Production',
+          color: '#f9f0ff',
+          textColor: '#722ed1'
+        },
+        collecting_copay: {
+          label: 'Collecting',
+          color: '#fff0f6',
+          textColor: '#c41d7f'
+        },
+        delivery_confirmation: {
+          label: 'Delivered',
+          color: '#e6fffb',
+          textColor: '#13c2c2'
+        },
+        default: {
+          color: '#f0f0f0',
+          textColor: '#595959'
+        }
       }
 
-      const labels = {
-        confirmed_prescription_received: 'Confirmed Prescription Received',
-        data_entry: 'Data Entry',
-        intake_processing: 'Intake Processing',
-        insurance_verification: 'Insurance Verification & Authorization',
-        copay_assistant: 'Co-pay Assistant or Foundation Assistant',
-        production: 'Production',
-        collecting_copay: 'Collecting Co-pay',
-        delivery_confirmation: 'Delivery Confirmation'
+      const config = statusConfig[row.status] || {
+        ...statusConfig.default,
+        label: row.status || 'Unknown'
       }
 
-      const type = statusMap[row.status] || 'default'
-      const label = labels[row.status] || row.status
-
-      return h(NTag, { type }, { default: () => label })
-    }
+      return h(NTag, {
+        style: {
+          backgroundColor: config.color,
+          color: config.textColor,
+          fontWeight: '500',
+          padding: '0 8px',
+          whiteSpace: 'nowrap'
+        },
+        bordered: false
+      }, { default: () => config.label })
+    },
+    width: 120
   },
-  {
-    title: 'Shipped At',
-    key: 'date_shipped',
-    render: (row) => row.date_shipped
-      ? new Date(row.date_shipped).toLocaleString()
-      : '—'
-  },
-  {
-    title: 'Delivered At',
-    key: 'delivered_at',
-    render: (row) => row.delivered_at
-      ? new Date(row.delivered_at).toLocaleString()
-      : '—'
+  { 
+    title: 'Ship ID', 
+    key: 'shipment_id',
+    className: 'hide-on-mobile',
+    width: 100
   }
 ]
 </script>
 
-
 <style scoped>
 .dashboard-container {
-  padding: 24px;
+  padding: 16px;
 }
+
 .greeting-card {
-  padding: 24px;
+  padding: 16px;
   background: linear-gradient(135deg, #f0f4ff, #dce7ff);
 }
+
 .greeting-card-content {
   display: flex;
   justify-content: space-between;
@@ -192,60 +266,112 @@ const columns = [
   flex-wrap: wrap;
   gap: 16px;
 }
+
 .greeting-left {
   flex: 1;
   min-width: 200px;
 }
+
 .greeting-right {
-  flex: 1;
-  max-width: 200px;
+  flex: 0 0 auto;
+}
+
+.help-container {
   background: white;
   padding: 12px;
   border-radius: 8px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  min-width: 200px;
 }
+
 .help-title {
   font-weight: bold;
-  font-size: 14px;
   display: block;
   margin-bottom: 8px;
 }
+
 .help-list {
   list-style: none;
   padding: 0;
   margin: 0;
-  font-size: 13px;
-  color: #333;
+  font-size: 14px;
 }
+
 .help-list li + li {
   margin-top: 4px;
 }
+
 .help-list a {
   color: #333;
   text-decoration: none;
 }
+
 .help-list a:hover {
   text-decoration: underline;
 }
+
 .subtext {
   margin-top: 8px;
-  color: #888;
+  color: #666;
   font-size: 14px;
 }
-.table-responsive {
-  overflow-x: auto;
+
+.table-container {
   width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 16px;
 }
-.table-responsive ::v-deep(.n-data-table) {
+
+.table-responsive {
   min-width: 800px;
 }
-@media (max-width: 600px) {
+
+.prescription-table :deep(.n-data-table-td) {
+  white-space: nowrap;
+  padding: 12px 8px !important;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 12px;
+  }
+  
   .greeting-card-content {
     flex-direction: column;
-    align-items: stretch;
   }
+  
   .greeting-right {
-    max-width: 100%;
+    width: 100%;
+    margin-top: 16px;
   }
+  
+  .help-container {
+    width: 100%;
+  }
+  
+  .hide-on-mobile {
+    display: none;
+  }
+  
+  .table-responsive {
+    min-width: 600px;
+  }
+  
+  .prescription-table :deep(.n-data-table-td) {
+    padding: 8px 6px !important;
+    font-size: 14px;
+  }
+}
+
+/* Scrollbar styling */
+.table-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 3px;
 }
 </style>

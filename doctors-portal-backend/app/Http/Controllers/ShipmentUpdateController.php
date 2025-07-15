@@ -90,19 +90,119 @@ class ShipmentUpdateController extends Controller
 
 
         $data = $request->validate([
-            'status'     => 'nullable|string',
-            'notes'      => 'nullable|string',
-            'user_id'  => 'nullable|exists:users,id',
-            "patient_name" => "nullable|string",
-            "prescription_name" => "nullable|string",
-            "rx_number" => "nullable|string",
-            'date_shipped'   => 'nullable|date',
-            'delivered_at'   => 'nullable|date',
-            // Add any other fields you want to allow updating
+            'patient_name'           => 'required|string',
+            'prescription_name'      => 'nullable|string',
+            'status'                 => 'nullable|string',
+            'user_id'                => 'required|exists:users,id',
+            'date_of_birth'          => 'nullable|date',
+            'insurance'              => 'nullable|string',
+            'city'                   => 'nullable|string',
+            'arrived_to_office_date' => 'nullable|string', // temporarily string, we'll cast it below
+            'source'                 => 'nullable|string',
+            'shipment_id'            => 'nullable|string',
+            'rx_number'              => 'nullable|string',
+            'date_shipped'           => 'nullable|date',
+            'delivered_at'           => 'nullable|date',
         ]);
 
         $update->update($data);
 
         return response()->json(['message' => 'Update successful', 'data' => $update]);
     }
+
+    public function importFromSheet(Request $request)
+    {
+        Log::info('✅ Google Sheet request hit the controller.');
+
+        // ✅ Verify the key
+        $apiKey = $request->header('X-API-KEY');
+        if ($apiKey !== env('SHIPMENT_SHEET_API_KEY')) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // ✅ Validate incoming payload
+        $data = $request->validate([
+            'patient_name'           => 'required|string',
+            'prescription_name'      => 'nullable|string',
+            'status'                 => 'nullable|string',
+            'sheet_identefier'       => 'required|string',
+            'date_of_birth'          => 'nullable|date',
+            'insurance'              => 'nullable|string',
+            'city'                   => 'nullable|string',
+            'arrived_to_office_date' => 'nullable|string',
+            'arrived_to_office_time' => 'nullable|string',
+            'source'                 => 'nullable|string',
+            'shipment_id'            => 'nullable|string',
+            'rx_number'              => 'nullable|string',
+            'date_shipped'           => 'nullable|date',
+            'delivered_at'           => 'nullable|date',
+        ]);
+
+        // ✅ Clean and normalize the sheet identifier
+        $cleanedIdentifier = trim(strtolower($data['sheet_identefier']));
+
+        // ✅ Try to match against user
+        $matchingUser = \App\Models\User::whereRaw('LOWER(TRIM(sheet_identifier)) LIKE ?', [
+            '%' . $cleanedIdentifier . '%'
+        ])->first();
+
+        if (!$matchingUser) {
+            return response()->json(['message' => 'No matching user found for the provided sheet_identefier'], 404);
+        }
+
+        $data['user_id'] = $matchingUser->id;
+        unset($data['sheet_identefier']);
+
+        // ✅ Combine arrival date & time
+        if (!empty($data['arrived_to_office_date'])) {
+            try {
+                $date = $data['arrived_to_office_date'];
+                $time = $data['arrived_to_office_time'] ?? '00:00 AM';
+                $combined = \Carbon\Carbon::parse("{$date} {$time}");
+                $data['arrived_to_office_date'] = $combined->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                Log::warning("Failed to parse arrival datetime: {$date} {$time}", ['error' => $e->getMessage()]);
+                $data['arrived_to_office_date'] = $date;
+            }
+        }
+
+        unset($data['arrived_to_office_time']);
+
+        // ✅ Check for existing record to prevent duplicates
+        $existing = ShipmentUpdate::where('user_id', $data['user_id'])
+            ->where('patient_name', $data['patient_name'])
+            ->where('prescription_name', $data['prescription_name'])
+            ->first();
+
+        if ($existing) {
+            // Only update if something has changed
+            $dirty = collect($data)->filter(function ($value, $key) use ($existing) {
+                return $existing->$key !== $value;
+            });
+
+            if ($dirty->isNotEmpty()) {
+                $existing->update($data);
+                $message = 'Shipment update modified';
+            } else {
+                $message = 'No changes detected — skipped update';
+            }
+
+            Log::info('✅ Updating shipment for patient: ' . $data['patient_name']);
+
+            return response()->json([
+                'message' => $message,
+                'data' => $existing
+            ]);
+        }
+
+        // ✅ Create new record
+        $shipment = ShipmentUpdate::create($data);
+        Log::info('✅ Creating new shipment for patient: ' . $data['patient_name']);
+
+        return response()->json([
+            'message' => 'Shipment update imported',
+            'data' => $shipment
+        ]);
+    }
+
 }
