@@ -16,7 +16,7 @@ services:
   php-fpm:
     build:
       context: ./doctors-portal-backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     container_name: doctors-backend-php
     volumes:
       - ./doctors-portal-backend:/var/www
@@ -36,18 +36,29 @@ services:
     networks:
       - doctors-network
 
-  frontend:
-    build:
-      context: ./doctors-portal-frontend
-      dockerfile: Dockerfile.dev
-    container_name: doctors-frontend
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./doctors-portal-frontend:/app
-    networks:
-      - doctors-network
-    command: sh -c "npm install && npx vite --host"
+  # frontend:
+  #   build:
+  #     context: ./doctors-portal-frontend
+  #     dockerfile: Dockerfile.dev
+  #   container_name: doctors-frontend
+  #   ports:
+  #     - "5173:5173"
+  #   volumes:
+  #     - ./doctors-portal-frontend:/app
+  #   networks:
+  #     - doctors-network
+  #   command: sh -c "npm install && npx vite --host"
+
+    frontend:
+      build:
+        context: ./doctors-portal-frontend
+        dockerfile: Dockerfile.prod
+      container_name: doctors-frontend
+      ports:
+        - "80:80"
+      networks:
+        - doctors-network
+
 
 volumes:
   mysql-data:
