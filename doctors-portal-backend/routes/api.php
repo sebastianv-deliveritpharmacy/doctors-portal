@@ -62,29 +62,29 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['auth:api', 'throttle:6,1'])->name('verification.send');
 
 
-Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
-    $user = User::find($id);
+// Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
+//     $user = User::find($id);
 
-    if (! $user) {
-        return response()->json(['message' => 'User not found'], 404);
-    }
+//     if (! $user) {
+//         return response()->json(['message' => 'User not found'], 404);
+//     }
 
-    if (! URL::hasValidSignature($request)) {
-        return response()->json(['message' => 'Invalid or expired verification link'], 403);
-    }
+//     if (! URL::hasValidSignature($request)) {
+//         return response()->json(['message' => 'Invalid or expired verification link'], 403);
+//     }
 
-    if ($user->hasVerifiedEmail()) {
-        return redirect('http://localhost:5173/email-verified'); // VUE ROUTE
-    }
+//     if ($user->hasVerifiedEmail()) {
+//         return redirect('http://localhost:5173/email-verified'); // VUE ROUTE
+//     }
 
-    if (! hash_equals((string) $hash, sha1($user->email))) {
-        return response()->json(['message' => 'Invalid hash'], 403);
-    }
+//     if (! hash_equals((string) $hash, sha1($user->email))) {
+//         return response()->json(['message' => 'Invalid hash'], 403);
+//     }
 
-    $user->markEmailAsVerified();
+//     $user->markEmailAsVerified();
 
-    return redirect('http://localhost:5173/email-verified'); // ✅ Replace with your VUE frontend route
-})->middleware('signed')->name('verification.verify');
+//     return redirect('http://localhost:5173/email-verified'); // ✅ Replace with your VUE frontend route
+// })->middleware('signed')->name('verification.verify');
 
 Route::post('/verify-2fa', function (Request $request) {
     $request->validate([
