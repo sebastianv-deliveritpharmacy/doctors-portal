@@ -1,30 +1,22 @@
-# Stage 1: Composer dependencies
-FROM composer:2 AS build
+# Dockerfile.prod
 
-WORKDIR /app
-
-# Copy full Laravel source early to make artisan available
-COPY . .
-
-# Install optimized dependencies (without dev)
-RUN composer install --no-dev --optimize-autoloader
-
-# Stage 2: PHP-FPM
 FROM php:8.2-fpm
 
-# Install PHP extensions
+# Install dependencies
 RUN apt-get update && apt-get install -y \
-    libpng-dev libonig-dev libxml2-dev zip unzip curl git \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    zip unzip curl git libpng-dev libonig-dev libxml2-dev
 
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Set working directory
 WORKDIR /var/www
 
-# Copy app + vendor from build stage
-COPY --from=build /app /var/www
+# Copy project files
+COPY . .
 
-# Set permissions for Laravel
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+# Run Composer install
+RUN composer install --no-dev --optimize-autoloader
 
-USER www-data
+# (Optional) Laravel commands
+RUN php artisan config:cache && php artisan route:cache && php artisan view:cache
