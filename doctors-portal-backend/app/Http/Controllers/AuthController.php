@@ -11,6 +11,10 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TwoFactorCodeMail;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Log;
+
+
 
 class AuthController extends Controller
 {
@@ -84,7 +88,8 @@ class AuthController extends Controller
         // logout and send code
         auth()->logout();
 
-        // Mail::to($user->email)->send(new TwoFactorCodeMail($user->two_factor_code));
+        $htmlContent = (new TwoFactorCodeMail($user->two_factor_code))->render();
+        $this->sendGraphMail($user->email, 'Your 2FA Code | DeliverIt Health', $htmlContent);
 
         return response()->json([
             'message' => 'Verification code sent.',
@@ -107,7 +112,8 @@ class AuthController extends Controller
         $user->save();
 
         // send email
-        Mail::to($user->email)->send(new TwoFactorCodeMail($user->two_factor_code));
+        $htmlContent = (new TwoFactorCodeMail($user->two_factor_code))->render();
+        $this->sendGraphMail($user->email, 'Your 2FA Code | DeliverIt Health', $htmlContent);
 
         return response()->json([
             'message' => 'Verification code resent.'
@@ -178,5 +184,58 @@ class AuthController extends Controller
             ? response()->json(['message' => 'Password has been reset.'])
             : response()->json(['message' => __($status)], 400);
     }
+
+    private function getMicrosoftGraphAccessToken()
+    {
+        $client = new \GuzzleHttp\Client();
+                Log::info('✅ ' . config('services.microsoft_mail.GRAPH_CLIENT_ID'));
+                Log::info('✅ ' . config('services.microsoft_mail.GRAPH_CLIENT_SECRET'));
+
+
+        $response = $client->post("https://login.microsoftonline.com/554f6b40-7694-4d23-852e-9d90a43fb525/oauth2/v2.0/token", [
+            'form_params' => [
+                'grant_type' => 'client_credentials',
+                'client_id' => config('services.microsoft_mail.GRAPH_CLIENT_ID'),
+                'client_secret' => config('services.microsoft_mail.GRAPH_CLIENT_SECRET'),
+                'scope' => 'https://graph.microsoft.com/.default',
+            ]
+        ]);
+
+        $data = json_decode($response->getBody(), true);
+        return $data['access_token'];
+    }
+
+    private function sendGraphMail($toEmail, $subject, $content)
+    {
+        $accessToken = $this->getMicrosoftGraphAccessToken(); // assumes you have a working token generator
+
+        $client = new \GuzzleHttp\Client();
+
+        $response = $client->post('https://graph.microsoft.com/v1.0/users/ITdeliveritgroup@deliveritpharmacy.com/sendMail', [
+            'headers' => [
+                'Authorization' => "Bearer {$accessToken}",
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'message' => [
+                    'subject' => $subject,
+                    'body' => [
+                        'contentType' => 'HTML',
+                        'content' => $content,
+                    ],
+                    'toRecipients' => [
+                        [
+                            'emailAddress' => [
+                                'address' => $toEmail,
+                            ],
+                        ],
+                    ],
+                ],
+                'saveToSentItems' => 'true',
+            ],
+        ]);
+    }
+
+
     
 }
