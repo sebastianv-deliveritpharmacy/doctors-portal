@@ -44,5 +44,8 @@ return [
     'api_key' => env('SHIPMENT_SHEET_API_KEY'),
     ],
 
-
+    'microsoft_mail' => [
+    'GRAPH_CLIENT_ID' => env('GRAPH_CLIENT_ID'),
+    'GRAPH_CLIENT_SECRET' => env('GRAPH_CLIENT_SECRET'),
+    ],
 ];
