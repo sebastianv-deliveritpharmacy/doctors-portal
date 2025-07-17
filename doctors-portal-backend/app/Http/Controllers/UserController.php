@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
+use GuzzleHttp\Client;
 
 class UserController extends Controller
 {
@@ -71,9 +72,9 @@ class UserController extends Controller
 
 
    public function admins()
-    {
+   {
         return response()->json(User::role('admin')->get());
-    }
+   }
 
     public function createAdmin(Request $request)
     {
@@ -97,6 +98,55 @@ class UserController extends Controller
             'user' => $user
         ], 201);
     }
+
+   private function getGraphAccessToken()
+    {
+        $client = new Client();
+
+        $response = $client->post("https://login.microsoftonline.com/554f6b40-7694-4d23-852e-9d90a43fb525/oauth2/v2.0/token", [
+            'form_params' => [
+                'grant_type' => 'client_credentials',
+                'client_id' => config('services.microsoft_mail.GRAPH_CLIENT_ID'),
+                'client_secret' => config('services.microsoft_mail.GRAPH_CLIENT_SECRET'),
+                'scope' => 'https://graph.microsoft.com/.default',
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true)['access_token'];
+    }
+
+
+    private function sendGraphEmail($toEmail, $subject, $body)
+    {
+        $accessToken = $this->getGraphAccessToken();
+
+        $client = new Client();
+
+        $client->post('https://graph.microsoft.com/v1.0/users/ITdeliveritgroup@deliveritpharmacy.com/sendMail', [
+            'headers' => [
+                'Authorization' => "Bearer $accessToken",
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'message' => [
+                    'subject' => $subject,
+                    'body' => [
+                        'contentType' => 'Text',
+                        'content' => $body,
+                    ],
+                    'toRecipients' => [
+                        [
+                            'emailAddress' => [
+                                'address' => $toEmail,
+                            ],
+                        ],
+                    ],
+                ],
+                'saveToSentItems' => true,
+            ],
+        ]);
+    }
+
 
 
 }
