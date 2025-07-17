@@ -40,4 +40,9 @@ return [
     'base_uri' => 'https://api.caretend.com/v3/', // confirm actual base URI in docs!
     ],
 
+    'shipment_sheet' => [
+    'api_key' => env('SHIPMENT_SHEET_API_KEY'),
+    ],
+
+
 ];
