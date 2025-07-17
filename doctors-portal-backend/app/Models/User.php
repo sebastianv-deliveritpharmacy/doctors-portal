@@ -14,6 +14,8 @@ use Spatie\Permission\Traits\HasRoles;
 use App\Mail\VerifyEmailCustom;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use GuzzleHttp\Client;
+
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -63,6 +65,23 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(CaretendCredential::class);
     }
 
+    private function getGraphAccessToken()
+    {
+        $client = new Client();
+
+        $response = $client->post("https://login.microsoftonline.com/554f6b40-7694-4d23-852e-9d90a43fb525/oauth2/v2.0/token", [
+            'form_params' => [
+                'grant_type' => 'client_credentials',
+                'client_id' => env('GRAPH_CLIENT_ID'),
+                'client_secret' => env('GRAPH_CLIENT_SECRET'),
+                'scope' => 'https://graph.microsoft.com/.default',
+            ]
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true)['access_token'];
+    }
+
+
     public function sendEmailVerificationNotification()
     {
         $verificationUrl = URL::temporarySignedRoute(
@@ -71,7 +90,39 @@ class User extends Authenticatable implements MustVerifyEmail
             ['id' => $this->id, 'hash' => sha1($this->email)]
         );
 
-        Mail::to($this->email)->send(new VerifyEmailCustom($this, $verificationUrl));
+        // Render Blade view to HTML
+        $htmlContent = View::make('emails.verify', [
+            'user' => $this,
+            'verificationUrl' => $verificationUrl,
+        ])->render();
+
+        $accessToken = $this->getGraphAccessToken();
+
+        $client = new Client();
+
+        $client->post('https://graph.microsoft.com/v1.0/users/ITdeliveritgroup@deliveritpharmacy.com/sendMail', [
+            'headers' => [
+                'Authorization' => "Bearer $accessToken",
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'message' => [
+                    'subject' => 'Verify Your Email Address',
+                    'body' => [
+                        'contentType' => 'HTML',
+                        'content' => $htmlContent,
+                    ],
+                    'toRecipients' => [
+                        [
+                            'emailAddress' => [
+                                'address' => $this->email,
+                            ],
+                        ],
+                    ],
+                ],
+                'saveToSentItems' => true,
+            ],
+        ]);
     }
 
     public function shipmentUpdates()
