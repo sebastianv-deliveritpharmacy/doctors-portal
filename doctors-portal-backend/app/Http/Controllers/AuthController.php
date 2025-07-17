@@ -188,9 +188,6 @@ class AuthController extends Controller
     private function getMicrosoftGraphAccessToken()
     {
         $client = new \GuzzleHttp\Client();
-                Log::info('✅ ' . config('services.microsoft_mail.GRAPH_CLIENT_ID'));
-                Log::info('✅ ' . config('services.microsoft_mail.GRAPH_CLIENT_SECRET'));
-
 
         $response = $client->post("https://login.microsoftonline.com/554f6b40-7694-4d23-852e-9d90a43fb525/oauth2/v2.0/token", [
             'form_params' => [
