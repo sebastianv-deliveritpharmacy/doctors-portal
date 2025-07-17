@@ -58,11 +58,12 @@ class VerifyEmailCustom extends Mailable
     public function build()
     {
         return $this->subject('Verify Your Email | DeliverIt Health')
-                    ->markdown('emails.verify')
-                    ->with([
-                        'user' => $this->user,
-                        'verificationUrl' => $this->verificationUrl,
-                    ]);
+            ->markdown('emails.verify')
+            ->with([
+                'user' => $this->user,
+                'verificationUrl' => $this->verificationUrl,
+            ]);
+
     }
     
 }

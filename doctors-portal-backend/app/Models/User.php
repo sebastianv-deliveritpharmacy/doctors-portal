@@ -15,7 +15,7 @@ use App\Mail\VerifyEmailCustom;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use GuzzleHttp\Client;
-
+use Illuminate\Support\Facades\View;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -72,8 +72,8 @@ class User extends Authenticatable implements MustVerifyEmail
         $response = $client->post("https://login.microsoftonline.com/554f6b40-7694-4d23-852e-9d90a43fb525/oauth2/v2.0/token", [
             'form_params' => [
                 'grant_type' => 'client_credentials',
-                'client_id' => env('GRAPH_CLIENT_ID'),
-                'client_secret' => env('GRAPH_CLIENT_SECRET'),
+                'client_id' => config('services.microsoft_mail.GRAPH_CLIENT_ID'),
+                'client_secret' => config('services.microsoft_mail.GRAPH_CLIENT_SECRET'),
                 'scope' => 'https://graph.microsoft.com/.default',
             ]
         ]);
@@ -91,10 +91,8 @@ class User extends Authenticatable implements MustVerifyEmail
         );
 
         // Render Blade view to HTML
-        $htmlContent = View::make('emails.verify', [
-            'user' => $this,
-            'verificationUrl' => $verificationUrl,
-        ])->render();
+        $htmlContent = (new \App\Mail\VerifyEmailCustom($this, $verificationUrl))->render();
+
 
         $accessToken = $this->getGraphAccessToken();
 
@@ -124,6 +122,7 @@ class User extends Authenticatable implements MustVerifyEmail
             ],
         ]);
     }
+
 
     public function shipmentUpdates()
     {
