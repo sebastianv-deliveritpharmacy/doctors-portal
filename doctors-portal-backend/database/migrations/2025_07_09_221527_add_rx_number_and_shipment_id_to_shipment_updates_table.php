@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('shipment_updates', function (Blueprint $table) {
-            $table->string('rx_number')->nullable()->after('prescription_name');
+            $table->string('rx_number')->nullable()->change();
             $table->string('shipment_id')->nullable()->after('rx_number');
         });
     }
