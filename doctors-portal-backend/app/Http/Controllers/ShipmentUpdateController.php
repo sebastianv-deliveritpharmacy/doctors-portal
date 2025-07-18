@@ -12,7 +12,11 @@ class ShipmentUpdateController extends Controller
 {
     public function index(Request $request)
     {
+        $user = $request->user(); // Get the authenticated user
         $query = ShipmentUpdate::query();
+
+        // Only include records that belong to the logged-in doctor
+        $query->where('doctor_id', $user->id);
 
         // If a search term is present, apply filters
         if ($search = $request->input('search')) {
@@ -24,6 +28,7 @@ class ShipmentUpdateController extends Controller
 
         return response()->json($query->paginate($request->input('per_page', 20)));
     }
+
 
 
 

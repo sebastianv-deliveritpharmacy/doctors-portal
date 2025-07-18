@@ -69,7 +69,7 @@ import { getCurrentUser } from '@/api/user'
 import { fetchShipmentsByDoctor } from '@/api/shipment'
 
 const message = useMessage()
-const user = ref({ id: '', name: '', email: '' })
+const user = ref({ name: '', email: '' })
 const prescriptions = ref([])
 const isLoading = ref(false)
 
@@ -91,7 +91,7 @@ const getUser = async () => {
 const getShipments = async () => {
   try {
     isLoading.value = true
-    const response = await fetchShipmentsByDoctor(user.value.id, currentPage.value, pageSize.value, searchTerm.value)
+    const response = await fetchShipments(currentPage.value, pageSize.value, searchTerm.value)
 
     prescriptions.value = response.data.data.map(item => ({
       id: item.id,
@@ -114,14 +114,13 @@ const getShipments = async () => {
   }
 }
 
-onMounted(async () => {
+onMounted(() => {
   const token = localStorage.getItem('access_token')
   if (token) {
-    await getUser()
-    await getShipments()
+    getUser()
+    getShipments()
   }
 })
-
 
 const columns = [
   // { 
