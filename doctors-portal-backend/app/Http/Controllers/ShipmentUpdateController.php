@@ -116,7 +116,7 @@ class ShipmentUpdateController extends Controller
 
         // ✅ Verify the key
         $apiKey = $request->header('X-API-KEY');
-        if ($apiKey !== env('SHIPMENT_SHEET_API_KEY')) {
+        if ($apiKey !== config('services.shipment_sheet.api_key')) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
