@@ -239,12 +239,6 @@ const columns = [
       }, { default: () => config.label })
     },
     width: 120
-  },
-  { 
-    title: 'Ship ID', 
-    key: 'shipment_id',
-    className: 'hide-on-mobile',
-    width: 100
   }
 ]
 </script>
