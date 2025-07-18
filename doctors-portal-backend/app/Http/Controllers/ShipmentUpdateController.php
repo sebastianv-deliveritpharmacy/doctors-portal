@@ -16,7 +16,7 @@ class ShipmentUpdateController extends Controller
         $query = ShipmentUpdate::query();
 
         // Only include records that belong to the logged-in doctor
-        $query->where('doctor_id', $user->id);
+        $query->where('user_id', $user->id);
 
         // If a search term is present, apply filters
         if ($search = $request->input('search')) {
