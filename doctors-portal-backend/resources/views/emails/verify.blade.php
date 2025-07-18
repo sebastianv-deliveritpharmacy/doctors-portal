@@ -1,14 +1,16 @@
 @component('mail::message')
-# Hello {{ $user->name }}
+# Welcome {{ $user->name }}!
 
-Thanks for signing up with **DeliverIt Health**! Please confirm your email address to activate your account and access the portal.
+Thank you for signing up with **DeliverIt Portal** — we're excited to have you on board!
 
-@component('mail::button', ['url' => $verificationUrl])
-Verify Email
+You can now explore your personalized portal and learn more about the services we offer.
+
+@component('mail::button', ['url' => 'https://portal.deliveritgroup.us/'])
+Visit DeliverIt Portal
 @endcomponent
 
 If you did not create this account, you can safely ignore this email.
 
 Thanks,<br>
-**DeliverIt Health Team**
+**The DeliverIt Portal Team**
 @endcomponent
