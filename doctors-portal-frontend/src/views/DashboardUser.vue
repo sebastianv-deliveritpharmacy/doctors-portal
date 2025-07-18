@@ -66,7 +66,7 @@ import {
   NCard, NStatistic, NSpace, useMessage, NDataTable, NTag, NInput, NPagination
 } from 'naive-ui'
 import { getCurrentUser } from '@/api/user'
-import { fetchShipmentsByDoctor } from '@/api/shipment'
+import { fetchShipments } from '@/api/shipment'
 
 const message = useMessage()
 const user = ref({ name: '', email: '' })

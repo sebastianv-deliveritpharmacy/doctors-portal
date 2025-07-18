@@ -1,1 +1,0 @@
-import{i as p}from"./axios-D3XPDuSg.js";const a=(t,e=1,s=20,n="")=>p.get(`/shipment-updates/doctor/${t}`,{params:{page:e,per_page:s,search:n}}),o=(t,e)=>p.put(`/shipment-updates/${t}`,e),c=t=>p.post("/shipment-updates",t);export{c,a as f,o as u};
