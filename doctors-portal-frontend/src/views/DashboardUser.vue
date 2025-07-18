@@ -66,7 +66,7 @@ import {
   NCard, NStatistic, NSpace, useMessage, NDataTable, NTag, NInput, NPagination
 } from 'naive-ui'
 import { getCurrentUser } from '@/api/user'
-import { fetchShipments } from '@/api/shipment'
+import { fetchShipmentsByDoctor } from '@/api/shipment'
 
 const message = useMessage()
 const user = ref({ name: '', email: '' })
@@ -91,7 +91,7 @@ const getUser = async () => {
 const getShipments = async () => {
   try {
     isLoading.value = true
-    const response = await fetchShipments(currentPage.value, pageSize.value, searchTerm.value)
+    const response = await fetchShipmentsByDoctor(user.id, currentPage.value, pageSize.value, searchTerm.value)
 
     prescriptions.value = response.data.data.map(item => ({
       id: item.id,
@@ -114,21 +114,22 @@ const getShipments = async () => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   const token = localStorage.getItem('access_token')
   if (token) {
-    getUser()
-    getShipments()
+    await getUser()
+    await getShipments()
   }
 })
 
+
 const columns = [
-  { 
-    title: 'ID', 
-    key: 'id',
-    className: 'hide-on-mobile',
-    width: 80
-  },
+  // { 
+  //   title: 'ID', 
+  //   key: 'id',
+  //   className: 'hide-on-mobile',
+  //   width: 80
+  // },
   { 
     title: 'Patient', 
     key: 'patient_name',
