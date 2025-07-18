@@ -20,16 +20,16 @@ Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) 
     }
 
     if ($user->hasVerifiedEmail()) {
-        return redirect('http://localhost:5173/email-verified');
+        return redirect('https://portal.deliveritgroup.us/email-verified');
     }
 
     $user->markEmailAsVerified();
 
-    return redirect('http://localhost:5173/email-verified');
+    return redirect('https://portal.deliveritgroup.us/email-verified');
 })->middleware('signed')->name('verification.verify');
 
 
 Route::get('/reset-password/{token}', function ($token) {
-    return redirect()->away("http://localhost:5173/reset-password/$token");
+    return redirect()->away("https://portal.deliveritgroup.us/reset-password/$token");
 })->middleware('guest')->name('password.reset');
 
