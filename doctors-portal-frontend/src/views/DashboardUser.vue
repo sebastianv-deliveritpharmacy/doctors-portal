@@ -6,7 +6,7 @@
         <div class="greeting-card-content">
           <div class="greeting-left">
             <n-statistic label="" :value="`Hello, ${user.name}`" />
-            <div class="subtext">Here you can see the status of your prescriptions</div>
+            <div class="subtext">  Here you can see the status of your prescriptions. Updates are pulled from our internal system every 30 minutes to ensure accuracy.</div>
           </div>
 
           <div class="greeting-right">

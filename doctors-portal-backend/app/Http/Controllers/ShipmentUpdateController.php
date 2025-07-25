@@ -70,7 +70,7 @@ class ShipmentUpdateController extends Controller
         $perPage = $request->input('per_page', 20);
         $search = $request->input('search');
 
-        $query = ShipmentUpdate::where('user_id', $userId);
+        $query = ShipmentUpdate::with('user')->where('user_id', $userId);
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -81,8 +81,12 @@ class ShipmentUpdateController extends Controller
 
         $updates = $query->paginate($perPage);
 
-        return response()->json($updates);
+        return response()->json([
+            'user_name' => optional($updates->first()?->user)->name,
+            'data' => $updates
+        ]);
     }
+
 
 
 
@@ -147,67 +151,72 @@ class ShipmentUpdateController extends Controller
         $cleanedIdentifier = trim(strtolower($data['sheet_identefier']));
 
         // ✅ Try to match against user
-        $matchingUser = \App\Models\User::whereRaw('LOWER(TRIM(sheet_identifier)) LIKE ?', [
+        $matchingUsers = \App\Models\User::whereRaw('LOWER(TRIM(sheet_identifier)) LIKE ?', [
             '%' . $cleanedIdentifier . '%'
-        ])->first();
+        ])->get();
 
-        if (!$matchingUser) {
+
+        if ($matchingUsers->isEmpty()) {
             return response()->json(['message' => 'No matching user found for the provided sheet_identefier'], 404);
         }
 
-        $data['user_id'] = $matchingUser->id;
-        unset($data['sheet_identefier']);
+        $results = [];
 
-        // ✅ Combine arrival date & time
-        if (!empty($data['arrived_to_office_date'])) {
-            try {
-                $date = $data['arrived_to_office_date'];
-                $time = $data['arrived_to_office_time'] ?? '00:00 AM';
-                $combined = \Carbon\Carbon::parse("{$date} {$time}");
-                $data['arrived_to_office_date'] = $combined->format('Y-m-d H:i:s');
-            } catch (\Exception $e) {
-                Log::warning("Failed to parse arrival datetime: {$date} {$time}", ['error' => $e->getMessage()]);
-                $data['arrived_to_office_date'] = $date;
-            }
+
+        foreach ($matchingUsers as $user) {
+                $payload = $data;
+                $payload['user_id'] = $user->id;
+
+                // Combine arrival datetime
+                if (!empty($payload['arrived_to_office_date'])) {
+                    try {
+                        $date = $payload['arrived_to_office_date'];
+                        $time = $payload['arrived_to_office_time'] ?? '00:00 AM';
+                        $combined = \Carbon\Carbon::parse("{$date} {$time}");
+                        $payload['arrived_to_office_date'] = $combined->format('Y-m-d H:i:s');
+                    } catch (\Exception $e) {
+                        Log::warning("Failed to parse arrival datetime: {$date} {$time}", ['error' => $e->getMessage()]);
+                        $payload['arrived_to_office_date'] = $date;
+                    }
+                }
+
+                unset($payload['arrived_to_office_time']);
+
+                // Check for existing shipment
+                $existing = ShipmentUpdate::where('user_id', $payload['user_id'])
+                    ->where('patient_name', $payload['patient_name'])
+                    ->where('prescription_name', $payload['prescription_name'])
+                    ->first();
+
+                if ($existing) {
+                    $dirty = collect($payload)->filter(fn($value, $key) => $existing->$key !== $value);
+                    if ($dirty->isNotEmpty()) {
+                        $existing->update($payload);
+                        $message = 'Shipment update modified';
+                    } else {
+                        $message = 'No changes detected — skipped update';
+                    }
+
+                    Log::info("✅ Updating shipment for patient: {$payload['patient_name']} (User ID: {$user->id})");
+
+                    $results[] = [
+                        'user_id' => $user->id,
+                        'message' => $message,
+                        'data'    => $existing
+                    ];
+                } else {
+                    $shipment = ShipmentUpdate::create($payload);
+                    Log::info("✅ Creating new shipment for patient: {$payload['patient_name']} (User ID: {$user->id})");
+
+                    $results[] = [
+                        'user_id' => $user->id,
+                        'message' => 'Shipment update imported',
+                        'data'    => $shipment
+                    ];
+                }
         }
 
-        unset($data['arrived_to_office_time']);
-
-        // ✅ Check for existing record to prevent duplicates
-        $existing = ShipmentUpdate::where('user_id', $data['user_id'])
-            ->where('patient_name', $data['patient_name'])
-            ->where('prescription_name', $data['prescription_name'])
-            ->first();
-
-        if ($existing) {
-            // Only update if something has changed
-            $dirty = collect($data)->filter(function ($value, $key) use ($existing) {
-                return $existing->$key !== $value;
-            });
-
-            if ($dirty->isNotEmpty()) {
-                $existing->update($data);
-                $message = 'Shipment update modified';
-            } else {
-                $message = 'No changes detected — skipped update';
-            }
-
-            Log::info('✅ Updating shipment for patient: ' . $data['patient_name']);
-
-            return response()->json([
-                'message' => $message,
-                'data' => $existing
-            ]);
-        }
-
-        // ✅ Create new record
-        $shipment = ShipmentUpdate::create($data);
-        Log::info('✅ Creating new shipment for patient: ' . $data['patient_name']);
-
-        return response()->json([
-            'message' => 'Shipment update imported',
-            'data' => $shipment
-        ]);
+        return response()->json($results);
     }
 
 }

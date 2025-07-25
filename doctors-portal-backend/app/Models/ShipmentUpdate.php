@@ -21,4 +21,10 @@ class ShipmentUpdate extends Model
         'arrived_to_office_date',
         'source',
     ];
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

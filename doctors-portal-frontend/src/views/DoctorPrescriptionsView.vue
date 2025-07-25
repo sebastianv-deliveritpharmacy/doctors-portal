@@ -6,7 +6,7 @@
         <div class="greeting-card-content">
           <div class="greeting-left">
             <n-statistic label="" :value="`You are currently viewing ${doctorName}`" />
-            <div class="subtext">These are the prescriptions associated with this doctor</div>
+            <div class="subtext">  These prescriptions are linked to this doctor and refresh every 30 minutes from our system.</div>
           </div>
 
           <div class="greeting-right">
@@ -263,8 +263,8 @@
     try {
       isLoading.value = true
       const response = await fetchShipmentsByDoctor(doctorId, currentPage.value, pageSize.value, searchTerm.value)
-      doctorName.value = response.doctorName || 'Doctor'
-      prescriptions.value = response.data.data.map(item => ({
+      doctorName.value = response.data.user_name || 'Doctor'
+      prescriptions.value = response.data.data.data.map(item => ({
         id: item.id,
         name: item.prescription_name || '-',
         status: item.status || 'unknown',
