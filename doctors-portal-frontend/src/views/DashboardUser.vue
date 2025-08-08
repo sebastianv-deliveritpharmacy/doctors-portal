@@ -5,16 +5,19 @@
       <n-card class="greeting-card">
         <div class="greeting-card-content">
           <div class="greeting-left">
-            <n-statistic label="" :value="`Hello, ${user.name}`" />
-            <div class="subtext">  Here you can see the status of your prescriptions. Updates are pulled from our internal system every 30 minutes to ensure accuracy.</div>
+            <n-statistic
+              :label="''"
+              :value="t('userDash.greeting', { name: user.name || '' })"
+            />
+            <div class="subtext">{{ t('userDash.subtext') }}</div>
           </div>
 
           <div class="greeting-right">
             <div class="help-container">
-              <span class="help-title">Need help? Contact us:</span>
+              <span class="help-title">{{ t('userDash.needHelp') }}</span>
               <ul class="help-list">
-                <li>Phone: <a href="tel:+11231231233">832-939-8137</a></li>
-                <li>Fax: 832 939 8128</li>
+                <li>{{ t('userDash.phone') }}: <a href="tel:+18329398137">832-939-8137</a></li>
+                <li>{{ t('userDash.fax') }}: 832 939 8128</li>
               </ul>
             </div>
           </div>
@@ -26,7 +29,7 @@
         <n-space justify="space-between" align="center" style="margin-bottom: 16px">
           <n-input
             v-model:value="searchTerm"
-            placeholder="Search prescriptions or patients..."
+            :placeholder="t('userDash.searchPlaceholder')"
             clearable
             style="max-width: 300px"
           />
@@ -61,12 +64,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, h } from 'vue'
+import { ref, onMounted, h, computed } from 'vue'
 import {
   NCard, NStatistic, NSpace, useMessage, NDataTable, NTag, NInput, NPagination
 } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
 import { getCurrentUser } from '@/api/user'
 import { fetchShipments } from '@/api/shipment'
+
+const { t } = useI18n()
 
 const message = useMessage()
 const user = ref({ name: '', email: '' })
@@ -84,7 +90,7 @@ const getUser = async () => {
     user.value = response.data
   } catch (error) {
     console.error('Failed to fetch user', error)
-    message.error('Failed to fetch user data. Please login again.')
+    message.error(t('userDash.errors.fetchUser'))
   }
 }
 
@@ -108,7 +114,7 @@ const getShipments = async () => {
     totalItems.value = response.data.total
   } catch (err) {
     console.error('Error fetching shipments:', err)
-    message.error('Unable to load shipments.')
+    message.error(t('userDash.errors.loadShipments'))
   } finally {
     isLoading.value = false
   }
@@ -122,110 +128,103 @@ onMounted(() => {
   }
 })
 
-const columns = [
-  // { 
-  //   title: 'ID', 
-  //   key: 'id',
-  //   className: 'hide-on-mobile',
-  //   width: 80
-  // },
-  { 
-    title: 'Patient', 
+const columns = computed(() => [
+  // { title: 'ID', key: 'id', className: 'hide-on-mobile', width: 80 },
+  {
+    title: t('userDash.table.patient'),
     key: 'patient_name',
     width: 150
   },
-  { 
-    title: 'Prescription', 
+  {
+    title: t('userDash.table.prescription'),
     key: 'name',
     width: 150
   },
-  { 
-    title: 'DOB', 
+  {
+    title: t('userDash.table.dob'),
     key: 'date_of_birth',
     className: 'hide-on-mobile',
     width: 120
   },
-  { 
-    title: 'Insurance', 
+  {
+    title: t('userDash.table.insurance'),
     key: 'insurance',
     className: 'hide-on-mobile',
     width: 150
   },
-  { 
-    title: 'City', 
+  {
+    title: t('userDash.table.city'),
     key: 'city',
     className: 'hide-on-mobile',
     width: 120
   },
-  { 
-    title: 'Source', 
+  {
+    title: t('userDash.table.source'),
     key: 'source',
     className: 'hide-on-mobile',
     width: 120
   },
-  { 
-    title: 'Arrived', 
+  {
+    title: t('userDash.table.arrived'),
     key: 'arrived_to_office_date',
-    render: (row) => row.arrived_to_office_date 
-      ? new Date(row.arrived_to_office_date).toLocaleDateString() 
+    render: (row) => row.arrived_to_office_date
+      ? new Date(row.arrived_to_office_date).toLocaleDateString()
       : '-',
     width: 120
   },
   {
-    title: 'Status',
+    title: t('userDash.table.status'),
     key: 'status',
     render: (row) => {
       const statusConfig = {
         confirmed_prescription_received: {
-          label: 'Confirmed',
+          label: t('statuses.confirmed'),
           color: '#e6f7ff',
           textColor: '#1890ff'
         },
         data_entry: {
-          label: 'Data Entry',
+          label: t('statuses.dataEntry'),
           color: '#f6ffed',
           textColor: '#52c41a'
         },
         intake_processing: {
-          label: 'Intake',
+          label: t('statuses.intake'),
           color: '#fff7e6',
           textColor: '#fa8c16'
         },
         insurance_verification: {
-          label: 'Insurance',
+          label: t('statuses.insuranceVerification'),
           color: '#fff1f0',
           textColor: '#f5222d'
         },
         copay_assistant: {
-          label: 'Co-pay',
+          label: t('statuses.copay'),
           color: '#f6faff',
           textColor: '#096dd9'
         },
         production: {
-          label: 'Production',
+          label: t('statuses.production'),
           color: '#f9f0ff',
           textColor: '#722ed1'
         },
         collecting_copay: {
-          label: 'Collecting',
+          label: t('statuses.collecting'),
           color: '#fff0f6',
           textColor: '#c41d7f'
         },
         delivery_confirmation: {
-          label: 'Delivered',
+          label: t('statuses.delivered'),
           color: '#e6fffb',
           textColor: '#13c2c2'
         },
         default: {
+          label: t('statuses.unknown'),
           color: '#f0f0f0',
           textColor: '#595959'
         }
       }
 
-      const config = statusConfig[row.status] || {
-        ...statusConfig.default,
-        label: row.status || 'Unknown'
-      }
+      const config = statusConfig[row.status] || statusConfig.default
 
       return h(NTag, {
         style: {
@@ -240,19 +239,18 @@ const columns = [
     },
     width: 120
   }
-]
+])
 </script>
 
 <style scoped>
+/* (unchanged styles) */
 .dashboard-container {
   padding: 16px;
 }
-
 .greeting-card {
   padding: 16px;
   background: linear-gradient(135deg, #f0f4ff, #dce7ff);
 }
-
 .greeting-card-content {
   display: flex;
   justify-content: space-between;
@@ -260,112 +258,30 @@ const columns = [
   flex-wrap: wrap;
   gap: 16px;
 }
-
-.greeting-left {
-  flex: 1;
-  min-width: 200px;
-}
-
-.greeting-right {
-  flex: 0 0 auto;
-}
-
+.greeting-left { flex: 1; min-width: 200px; }
+.greeting-right { flex: 0 0 auto; }
 .help-container {
-  background: white;
-  padding: 12px;
-  border-radius: 8px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
-  min-width: 200px;
+  background: white; padding: 12px; border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.05); min-width: 200px;
 }
-
-.help-title {
-  font-weight: bold;
-  display: block;
-  margin-bottom: 8px;
-}
-
-.help-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-size: 14px;
-}
-
-.help-list li + li {
-  margin-top: 4px;
-}
-
-.help-list a {
-  color: #333;
-  text-decoration: none;
-}
-
-.help-list a:hover {
-  text-decoration: underline;
-}
-
-.subtext {
-  margin-top: 8px;
-  color: #666;
-  font-size: 14px;
-}
-
-.table-container {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  margin-bottom: 16px;
-}
-
-.table-responsive {
-  min-width: 800px;
-}
-
-.prescription-table :deep(.n-data-table-td) {
-  white-space: nowrap;
-  padding: 12px 8px !important;
-}
-
-/* Mobile styles */
+.help-title { font-weight: bold; display: block; margin-bottom: 8px; }
+.help-list { list-style: none; padding: 0; margin: 0; font-size: 14px; }
+.help-list li + li { margin-top: 4px; }
+.help-list a { color: #333; text-decoration: none; }
+.help-list a:hover { text-decoration: underline; }
+.subtext { margin-top: 8px; color: #666; font-size: 14px; }
+.table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 16px; }
+.table-responsive { min-width: 800px; }
+.prescription-table :deep(.n-data-table-td) { white-space: nowrap; padding: 12px 8px !important; }
 @media (max-width: 768px) {
-  .dashboard-container {
-    padding: 12px;
-  }
-  
-  .greeting-card-content {
-    flex-direction: column;
-  }
-  
-  .greeting-right {
-    width: 100%;
-    margin-top: 16px;
-  }
-  
-  .help-container {
-    width: 100%;
-  }
-  
-  .hide-on-mobile {
-    display: none;
-  }
-  
-  .table-responsive {
-    min-width: 600px;
-  }
-  
-  .prescription-table :deep(.n-data-table-td) {
-    padding: 8px 6px !important;
-    font-size: 14px;
-  }
+  .dashboard-container { padding: 12px; }
+  .greeting-card-content { flex-direction: column; }
+  .greeting-right { width: 100%; margin-top: 16px; }
+  .help-container { width: 100%; }
+  .hide-on-mobile { display: none; }
+  .table-responsive { min-width: 600px; }
+  .prescription-table :deep(.n-data-table-td) { padding: 8px 6px !important; font-size: 14px; }
 }
-
-/* Scrollbar styling */
-.table-container::-webkit-scrollbar {
-  height: 6px;
-}
-
-.table-container::-webkit-scrollbar-thumb {
-  background: #d9d9d9;
-  border-radius: 3px;
-}
+.table-container::-webkit-scrollbar { height: 6px; }
+.table-container::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 3px; }
 </style>

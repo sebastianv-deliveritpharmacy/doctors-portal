@@ -1,6 +1,6 @@
 <template>
   <div class="forgot-container">
-    <n-card title="Reset Password" hoverable class="forgot-card">
+    <n-card :title="t('forgot.title')" hoverable class="forgot-card">
       <n-form
         ref="formRef"
         :model="formValue"
@@ -8,10 +8,10 @@
         size="large"
         @submit.prevent="submitRequest"
       >
-        <n-form-item path="email" label="Email">
+        <n-form-item path="email" :label="t('forgot.emailLabel')">
           <n-input
             v-model:value="formValue.email"
-            placeholder="Enter your registered email"
+            :placeholder="t('forgot.emailPlaceholder')"
             @keydown.enter.prevent
           />
         </n-form-item>
@@ -25,11 +25,11 @@
             attr-type="submit"
             style="background-color: #2080f0;"
           >
-            Send Reset Link
+            {{ t('forgot.sendLink') }}
           </n-button>
 
           <n-button text @click="router.push('/login')" style="text-align: center; width: 100%">
-            Back to Login
+            {{ t('forgot.backToLogin') }}
           </n-button>
         </n-space>
       </n-form>
@@ -51,6 +51,9 @@ import {
 import { useRouter } from 'vue-router'
 import axios from '@/api/axios'
 import { apiRoutes } from '@/api/apiRoutes'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const message = useMessage()

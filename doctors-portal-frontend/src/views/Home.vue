@@ -16,14 +16,12 @@
           />
 
           <!-- Headline -->
-          <n-h2 class="welcome-text">Welcome to DeliverIt's Doctor Portal</n-h2>
-          <n-p class="subtitle">
-            Streamline prescription management and referral tracking with real-time integration.
-          </n-p>
+          <n-h2 class="welcome-text">{{ $t('home.welcome') }}</n-h2>
+          <n-p class="subtitle">{{ $t('home.subtitle') }}</n-p>
 
           <!-- Login Button -->
           <n-button type="primary" class="login-button" @click="navigateToLogin">
-            Doctor Login
+            {{ $t('home.login') }}
             <n-icon class="ml-2">
               <ArrowForwardSharp />
             </n-icon>
@@ -45,10 +43,8 @@
           
 
           <!-- Features -->
-                      <n-h2 class="welcome-text">Powerful Tools for Smarter Care</n-h2>
-                      <n-p class="subtitle">
-            Monitor prescriptions, referrals, and patient statuses in real time — all from one intuitive, doctor-focused platform.
-          </n-p>
+                      <n-h2 class="welcome-text">{{ $t('home.toolsTitle') }}</n-h2>
+                      <n-p class="subtitle">{{ $t('home.toolsDescription') }}</n-p>
           <n-space justify="center" wrap class="features-section">
 
             <n-card hoverable class="feature-card">
@@ -57,9 +53,9 @@
                   <check-icon />
                 </n-icon>
               </div>
-              <n-h3 class="feature-title">Prescription Status</n-h3>
+              <n-h3 class="feature-title">{{ $t('home.features.statusTitle') }}</n-h3>
               <n-p class="feature-description">
-                View and manage prescriptions marked as Active, Inactive, or Processing — updated in real-time via CaredAPI.
+                {{ $t('home.features.statusDesc') }}
               </n-p>
             </n-card>
 
@@ -69,9 +65,9 @@
                   <calendar-icon />
                 </n-icon>
               </div>
-              <n-h3 class="feature-title">Referral Workflow</n-h3>
+              <n-h3 class="feature-title">{{ $t('home.features.referralTitle') }}</n-h3>
               <n-p class="feature-description">
-                Stay informed on each referral’s journey — from Benefits Verification to Insurance Approval or Denial.
+                {{ $t('home.features.referralDesc') }}
               </n-p>
             </n-card>
 
@@ -81,9 +77,9 @@
                   <patient-icon />
                 </n-icon>
               </div>
-              <n-h3 class="feature-title">Patient Status</n-h3>
+              <n-h3 class="feature-title">{{ $t('home.features.patientTitle') }}</n-h3>
               <n-p class="feature-description">
-                Track patient activation manually or programmatically. Ensure visibility into each patient’s current state.
+                {{ $t('home.features.patientDesc') }}
               </n-p>
             </n-card>
           </n-space>
@@ -95,14 +91,13 @@
       <!-- FAQ Section -->
 <section class="faq-section">
   <div class="faq-header">
-    <h2>Frequently Asked Questions</h2>
+    <h2>{{ $t('home.faq.description') }}</h2>
     <p>
-      If you cannot find an answer to your question in our FAQ, you can always contact us or email us.
-      We will answer you shortly!
+     {{ $t('home.faq.title') }}
     </p>
     <div class="faq-buttons">
       <n-button round type="primary" secondary>
-        <n-icon class="mr-1"><MailOutline /></n-icon>Email Us
+        <n-icon class="mr-1"><MailOutline /></n-icon>{{ $t('home.faq.email') }}
       </n-button>
     </div>
   </div>
@@ -111,35 +106,36 @@
     <div class="faq-category">
       <div class="faq-title">
         <n-icon size="20" color="#04d666"><HelpCircleOutline /></n-icon>
-        <strong>General Questions</strong>
+        <strong>{{ $t('home.faq.general') }}</strong>
       </div>
   <n-collapse accordion>
-    <n-collapse-item title="How can I track the status of prescriptions in real time?" name="1">
-      Our platform syncs directly with CaredAPI to give you real-time updates on every prescription. You can see whether a prescription is Active, Inactive, or currently Processing — all from your dashboard.
+   <n-collapse-item :title="$t('home.faq.q1')" name="1">
+      {{ $t('home.faq.a1') }}
     </n-collapse-item>
 
-    <n-collapse-item title="What stages are included in the referral workflow?" name="2">
-      The referral workflow includes Benefits Verification, Insurance Approval, Denial, and other key steps. You can follow each referral's journey without having to call or email external parties.
+    <n-collapse-item :title="$t('home.faq.q2')" name="2">
+      {{ $t('home.faq.a2') }}
     </n-collapse-item>
 
-    <n-collapse-item title="Can I see whether a patient has been activated?" name="3">
-      Yes. You can monitor patient activation manually or programmatically through the portal. Each patient’s current state is clearly labeled and searchable.
+    <n-collapse-item :title="$t('home.faq.q3')" name="3">
+      {{ $t('home.faq.a3') }}
     </n-collapse-item>
 
-    <n-collapse-item title="How does the system integrate with CaredAPI for prescription updates?" name="4">
-      Our integration with CaredAPI pulls prescription updates in real time. This ensures your records are always current without requiring manual syncing or third-party tools.
+
+    <n-collapse-item :title="$t('home.faq.q4')" name="4">
+      {{ $t('home.faq.a4') }}
     </n-collapse-item>
 
-    <n-collapse-item title="Is it possible to monitor multiple patient statuses from one dashboard?" name="5">
-      Absolutely. Our doctor-focused dashboard gives you an overview of all patient statuses at once. This includes their prescription states, referral progress, and activation status.
+    <n-collapse-item :title="$t('home.faq.q5')" name="5">
+      {{ $t('home.faq.a5') }}
     </n-collapse-item>
 
-    <n-collapse-item title="What types of prescription states are supported?" name="6">
-      We currently support Active, Inactive, and Processing states — with more granular tracking coming soon. Each status is color-coded and easily filterable.
+    <n-collapse-item :title="$t('home.faq.q6')" name="6">
+      {{ $t('home.faq.a6') }}
     </n-collapse-item>
 
-    <n-collapse-item title="How frequently is patient data updated in the portal?" name="7">
-      Patient data is updated in real time as events occur. You never have to wonder if you're looking at outdated information — what you see is always the current state.
+    <n-collapse-item :title="$t('home.faq.q7')" name="7">
+      {{ $t('home.faq.a7') }}
     </n-collapse-item>
   </n-collapse>
     </div>
@@ -147,23 +143,23 @@
    <div class="faq-category">
   <div class="faq-title">
     <n-icon size="20" color="#b53339"><ShieldOutline /></n-icon>
-    <strong>Privacy & Security</strong>
+    <strong>{{ $t('home.faq.privacy') }}</strong>
   </div>
   <n-collapse accordion>
-    <n-collapse-item title="Is the platform HIPAA compliant?" name="1">
-      Yes. Our platform is fully HIPAA compliant. We adhere to strict data protection and privacy standards to ensure that all patient and prescription information is secure and confidential.
+   <n-collapse-item :title="$t('home.faq.q8')" name="1">
+      {{ $t('home.faq.a8') }}
     </n-collapse-item>
 
-    <n-collapse-item title="How is patient data protected?" name="2">
-      Patient data is encrypted both in transit and at rest. We use secure APIs, access control, and logging to ensure only authorized users can view or manage sensitive information.
+    <n-collapse-item :title="$t('home.faq.q9')" name="2">
+      {{ $t('home.faq.a9') }}
     </n-collapse-item>
 
-    <n-collapse-item title="Who can access medical information on the platform?" name="3">
-      Only verified and authorized users such as licensed physicians or approved medical staff can access patient or prescription data. Role-based permissions control visibility at every level.
+    <n-collapse-item :title="$t('home.faq.q10')" name="3">
+      {{ $t('home.faq.a10') }}
     </n-collapse-item>
 
-    <n-collapse-item title="Do you store or process any data outside the U.S.?" name="4">
-      No. All data is stored and processed within secure U.S.-based data centers that comply with HIPAA and other healthcare industry regulations.
+     <n-collapse-item :title="$t('home.faq.q11')" name="4">
+      {{ $t('home.faq.a11') }}
     </n-collapse-item>
   </n-collapse>
 </div>
@@ -181,9 +177,9 @@
 
     <!-- Contact Modal -->
     <n-modal v-model:show="showContact">
-      <n-card style="width: 600px" title="Contact Us">
+      <n-card style="width: 600px" :title="$t('home.faq.title')">
         <n-p>Email: doctors@deliverit.health</n-p>
-        <n-p>Phone: (555) 123-4567</n-p>
+        <n-p>{{ $t('home.faq.phone') }}</n-p>
       </n-card>
     </n-modal>
   </n-layout>
@@ -222,6 +218,9 @@ import {
 
 import HeaderComponent from '@/components/HeaderComponent.vue'
 import FooterComponent from '@/components/FooterComponent.vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const showContact = ref(false)

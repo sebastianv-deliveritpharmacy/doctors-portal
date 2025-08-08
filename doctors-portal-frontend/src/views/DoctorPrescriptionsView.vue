@@ -5,15 +5,15 @@
       <n-card class="greeting-card">
         <div class="greeting-card-content">
           <div class="greeting-left">
-            <n-statistic label="" :value="`You are currently viewing ${doctorName}`" />
-            <div class="subtext">  These prescriptions are linked to this doctor and refresh every 30 minutes from our system.</div>
+             <n-statistic :label="$t('dashboardPrescription.currentlyViewing')" :value="`${$t('dashboardPrescription.viewing')} ${doctorName}`" />
+            <div class="subtext">{{ $t('dashboardPrescription.prescriptionRefreshNote') }}</div>
           </div>
 
           <div class="greeting-right">
             <div class="help-container">
-              <span class="help-title">Need help? Contact us:</span>
+              <span class="help-title">{{ $t('dashboardPrescription.needHelp') }}</span>
               <ul class="help-list">
-                <li>Phone: <a href="tel:+11231231233">832-939-8137</a></li>
+                <li>{{ $t('dashboardPrescription.phone') }}: <a href="tel:+11231231233">832-939-8137</a></li>
                 <li>Fax: 832 939 8128</li>
               </ul>
             </div>
@@ -32,10 +32,10 @@
           />
           <n-space justify="space-between" align="center">
             <n-button type="primary"  @click="$router.push('/dashboard/doctors')">
-              Go Back
+              {{ $t('dashboardPrescription.goBack') }}
             </n-button>
             <n-button type="primary" @click="openAddModal">
-              Add Prescription
+              {{ $t('dashboardPrescription.addPrescription') }}
             </n-button>
           </n-space>
         </n-space>
@@ -73,21 +73,21 @@
   style="width: 500px;"
 >
   <template #header>
-      <h2>{{ editingPrescription.id ? 'Edit Prescription' : 'Create Prescription' }}</h2>
+      <h2>{{ editingPrescription.id ? $t('dashboardPrescription.editPrescription') : $t('dashboardPrescription.createPrescription') }}</h2>
   </template>
 
   <n-form>
     <!-- Patient Name + DOB (same row) -->
     <n-grid :cols="24" :x-gap="12">
-      <n-form-item-gi :span="12" label="Patient Name">
-        <n-input v-model:value="editingPrescription.patient_name" placeholder="Patient Name" />
+      <n-form-item-gi :span="12" :label="$t('dashboardPrescription.patientName')">
+        <n-input v-model:value="editingPrescription.patient_name" :placeholder="$t('dashboardPrescription.patientName')"/>
       </n-form-item-gi>
-      <n-form-item-gi :span="12" label="Date of Birth">
+      <n-form-item-gi :span="12" :label="$t('dashboardPrescription.dob')">
         <n-date-picker
           v-model:value="editingPrescription.date_of_birth"
           type="date"
           value-format="yyyy-MM-dd"
-          placeholder="Select date"
+          :placeholder="$t('dashboardPrescription.dobPlaceHolder')"
           clearable
         />
       </n-form-item-gi>
@@ -95,29 +95,29 @@
 
     <!-- Prescription Name + Source (same row) -->
     <n-grid :cols="24" :x-gap="12">
-      <n-form-item-gi :span="12" label="Prescription Name">
-        <n-input v-model:value="editingPrescription.name" placeholder="Prescription Name" />
+      <n-form-item-gi :span="12" :label="$t('dashboardPrescription.prescriptionName')">
+        <n-input v-model:value="editingPrescription.name" :placeholder="$t('dashboardPrescription.prescriptionName')" />
       </n-form-item-gi>
       <n-form-item-gi :span="12" label="Source">
-        <n-input v-model:value="editingPrescription.source" placeholder="Source" />
+        <n-input v-model:value="editingPrescription.source" :placeholder="$t('dashboardPrescription.source')" />
       </n-form-item-gi>
     </n-grid>
 
     <!-- Insurance + City (same row) -->
     <n-grid :cols="24" :x-gap="12">
-      <n-form-item-gi :span="12" label="Insurance">
-        <n-input v-model:value="editingPrescription.insurance" placeholder="Insurance Provider" />
+      <n-form-item-gi :span="12" :label="$t('dashboardPrescription.insurance')">
+        <n-input v-model:value="editingPrescription.insurance" :placeholder="$t('dashboardPrescription.insurance')" />
       </n-form-item-gi>
-      <n-form-item-gi :span="12" label="City">
-        <n-input v-model:value="editingPrescription.city" placeholder="City" />
+      <n-form-item-gi :span="12" :label="$t('dashboardPrescription.city')">
+        <n-input v-model:value="editingPrescription.city" :placeholder="$t('dashboardPrescription.city')" />
       </n-form-item-gi>
     </n-grid>
 
     <!-- Status (expanded text area) -->
-    <n-form-item label="Status">
+    <n-form-item :label="$t('dashboardPrescription.status')">
       <n-input
         v-model:value="editingPrescription.status"
-        placeholder="Enter status manually"
+        :placeholder="$t('dashboardPrescription.status')"
         type="textarea"
         :autosize="{
           minRows: 3,
@@ -128,19 +128,19 @@
     </n-form-item>
 
     <!-- Arrived to Office Date (full width) -->
-    <n-form-item label="Arrived to Office Date">
+    <n-form-item :label="$t('dashboardPrescription.arrivedToOffice')">
       <n-date-picker
         v-model:value="editingPrescription.arrived_to_office_date"
         type="datetime"
         value-format="yyyy-MM-dd HH:mm:ss"
-        placeholder="Select date"
+        :placeholder="$t('dashboardPrescription.dobPlaceHolder')"
         clearable
       />
     </n-form-item>
 
     <n-space justify="end" class="mt-4">
-      <n-button @click="showAddEditModal = false">Cancel</n-button>
-      <n-button type="primary" @click="savePrescription">Save</n-button>
+      <n-button @click="showAddEditModal = false">{{$t('dashboardPrescription.cancel')}}</n-button>
+      <n-button type="primary" @click="savePrescription">{{$t('dashboardPrescription.save')}}</n-button>
     </n-space>
   </n-form>
 </n-modal>
@@ -159,6 +159,9 @@
   } from 'naive-ui'
 
   import { fetchShipmentsByDoctor, createShipment, updateShipment } from '@/api/shipment'
+  import { useI18n } from 'vue-i18n'
+
+  const { t } = useI18n()
 
   const route = useRoute()
   const message = useMessage()
@@ -193,14 +196,14 @@
   })
 
   const statusOptions = [
-    { label: 'Confirmed Prescription Received', value: 'confirmed_prescription_received' },
-    { label: 'Data Entry', value: 'data_entry' },
-    { label: 'Intake Processing', value: 'intake_processing' },
-    { label: 'Insurance Verification & Authorization', value: 'insurance_verification' },
-    { label: 'Co-pay Assistant or Foundation Assistant', value: 'copay_assistant' },
-    { label: 'Production', value: 'production' },
-    { label: 'Collecting Co-pay', value: 'collecting_copay' },
-    { label: 'Delivery Confirmation', value: 'delivery_confirmation' }
+    { label: t('dashboardPrescription.confirmed'), value: 'confirmed_prescription_received' },
+    { label: t('dashboardPrescription.dataEntry'), value: 'data_entry' },
+    { label: t('dashboardPrescription.intake'), value: 'intake_processing' },
+    { label: t('dashboardPrescription.insuranceVerification'), value: 'insurance_verification' },
+    { label: t('dashboardPrescription.copay'), value: 'copay_assistant' },
+    { label: t('dashboardPrescription.production'), value: 'production' },
+    { label: t('dashboardPrescription.collecting'), value: 'collecting_copay' },
+    { label: t('dashboardPrescription.delivered'), value: 'delivery_confirmation' }
   ]
 
   const openAddModal = () => {
@@ -245,17 +248,17 @@
 
       if (editingPrescription.value.id) {
         await updateShipment(editingPrescription.value.id, payload)
-        message.success('Shipment updated!')
+        message.success(t('dashboardPrescription.editShipment'))
       } else {
         await createShipment(payload)
-        message.success('Shipment created!')
+        message.success(t('dashboardPrescription.addShipment'))
       }
 
       showAddEditModal.value = false
       getPrescriptions()
     } catch (err) {
       console.error('Error saving shipment:', err)
-      message.error('Could not save shipment.')
+      message.error(t('dashboardPrescription.errorShipment'))
     }
   }
 
@@ -279,7 +282,7 @@
       totalItems.value = response.data.total
     } catch (err) {
       console.error('Error fetching shipments:', err)
-      message.error('Unable to load shipment updates.')
+      message.error(t('dashboardPrescription.errorUploadShipment'))
     } finally {
       isLoading.value = false
     }
@@ -296,57 +299,57 @@
   onMounted(getPrescriptions)
 
 const columns = [
-  { 
-    title: 'ID', 
+  {
+    title: t('dashboardPrescription.table.id'),
     key: 'id',
     className: 'hide-on-mobile',
     width: 80
   },
-  { 
-    title: 'Patient', 
+  {
+    title: t('dashboardPrescription.table.patient'),
     key: 'patient_name',
     width: 150
   },
-  { 
-    title: 'Prescription', 
+  {
+    title: t('dashboardPrescription.table.prescription'),
     key: 'name',
     width: 150
   },
-  { 
-    title: 'DOB', 
+  {
+    title: t('dashboardPrescription.table.dob'),
     key: 'date_of_birth',
     className: 'hide-on-mobile',
     width: 120,
     render: (row) => row.date_of_birth || '-'
   },
-  { 
-    title: 'Insurance', 
+  {
+    title: t('dashboardPrescription.table.insurance'),
     key: 'insurance',
     className: 'hide-on-mobile',
     width: 120
   },
-  { 
-    title: 'City', 
+  {
+    title: t('dashboardPrescription.table.city'),
     key: 'city',
     className: 'hide-on-mobile',
     width: 120
   },
-  { 
-    title: 'Source', 
+  {
+    title: t('dashboardPrescription.table.source'),
     key: 'source',
     className: 'hide-on-mobile',
     width: 120
   },
-  { 
-    title: 'Arrived', 
+  {
+    title: t('dashboardPrescription.table.arrived'),
     key: 'arrived_to_office_date',
     width: 150,
-    render: (row) => row.arrived_to_office_date 
-      ? new Date(row.arrived_to_office_date).toLocaleString() 
+    render: (row) => row.arrived_to_office_date
+      ? new Date(row.arrived_to_office_date).toLocaleString()
       : '-'
   },
   {
-    title: 'Status',
+    title: t('dashboardPrescription.table.status'),
     key: 'status',
     width: 180,
     render: (row) => {
@@ -415,7 +418,7 @@ const columns = [
     }
   },
   {
-    title: 'Actions',
+    title: t('dashboardPrescription.table.actions'),
     key: 'actions',
     width: 100,
     render: (row) => h('div', { style: 'display: flex; gap: 8px;' }, [
@@ -424,10 +427,11 @@ const columns = [
         type: 'info',
         secondary: true,
         onClick: () => openEditModal(row)
-      }, { default: () => 'Edit' })
+      }, { default: () => t('dashboardPrescription.table.edit') })
     ])
   }
 ]
+
 </script>
 
 

@@ -46,7 +46,6 @@ const routes: RouteRecordRaw[] = [
         path: 'settings',
         name: 'Settings',
         component: () => import('@/views/DashboardSettings.vue'),
-        meta: { requiresAdmin: true } // 🔐 Only for admins
 
       },
       {

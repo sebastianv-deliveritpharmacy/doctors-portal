@@ -1,15 +1,15 @@
 <template>
-  <n-card title="Manage Doctors">
+  <n-card :title="$t('doctors.title')">
     <!-- Search + Add -->
     <n-space justify="space-between" align="center" class="mb-4">
       <n-input
         v-model:value="searchTerm"
-        placeholder="Search doctors..."
+        :placeholder="$t('doctors.searchPlaceholder')"
         clearable
         style="max-width: 300px"
       />
       <n-button type="primary" @click="showAddUserModal = true">
-        Add Doctor
+          {{ $t('doctors.add') }}
       </n-button>
     </n-space>
 
@@ -42,7 +42,7 @@
       style="width: 500px;"
     >
       <template #header>
-        <h2 class="text-lg font-bold m-0">{{ editingUserId ? 'Edit Doctor' : 'Add New Doctor' }}</h2>
+        <h2 class="text-lg font-bold m-0">{{ editingUserId ? $t('doctors.edit') : $t('doctors.addNew') }}</h2>
       </template>
 
       <n-form
@@ -52,40 +52,30 @@
         label-width="120px"
         size="large"
       >
-        <n-form-item label="Name" path="name">
-          <n-input v-model:value="newUser.name" placeholder="User name" />
+        <n-form-item :label="$t('doctors.name')" path="name">
+          <n-input v-model:value="newUser.name" :placeholder="$t('doctors.name')" />
         </n-form-item>
 
-        <n-form-item label="Email" path="email">
-          <n-input v-model:value="newUser.email" placeholder="User email" />
+        <n-form-item :label="$t('doctors.email')" path="email">
+          <n-input v-model:value="newUser.email" :placeholder="$t('doctors.email')" />
         </n-form-item>
 
-        <n-form-item label="Sheet Identifier" path="sheet">
-          <n-input v-model:value="newUser.sheet_identifier" placeholder="User sheet identifier" />
+        <n-form-item :label="$t('doctors.sheetId')" path="sheet">
+          <n-input v-model:value="newUser.sheet_identifier" :placeholder="$t('doctors.sheetId')" />
         </n-form-item>
 
-        <n-form-item label="Password" path="password">
-          <n-input
-            v-model:value="newUser.password"
-            type="password"
-            placeholder="Password"
-            show-password-on="click"
-          />
+        <n-form-item :label="$t('doctors.password')" path="password">
+          <n-input v-model:value="newUser.password" type="password" :placeholder="$t('doctors.password')" show-password-on="click" />
         </n-form-item>
 
-        <n-form-item label="Confirm Password" path="password_confirmation">
-          <n-input
-            v-model:value="newUser.password_confirmation"
-            type="password"
-            placeholder="Confirm Password"
-            show-password-on="click"
-          />
+        <n-form-item :label="$t('doctors.confirmPassword')" path="password_confirmation">
+          <n-input v-model:value="newUser.password_confirmation" type="password" :placeholder="$t('doctors.confirmPassword')" show-password-on="click" />
         </n-form-item>
 
         <n-space justify="end" class="mt-6">
-          <n-button @click="showAddUserModal = false">Cancel</n-button>
+          <n-button @click="showAddUserModal = false">{{ $t('doctors.cancel') }}</n-button>
           <n-button type="primary" :loading="addingUser" @click="submitAddUser">
-            Save
+            {{ $t('doctors.save') }}
           </n-button>
         </n-space>
       </n-form>
@@ -102,7 +92,9 @@ import {
 import { AlertCircleOutline } from '@vicons/ionicons5'
 import axios from '@/api/axios'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const users = ref([])
 const loading = ref(false)
 const showAddUserModal = ref(false)
@@ -122,48 +114,46 @@ const newUser = ref({
 })
 
 const rules = computed(() => ({
-  name: [{ required: true, message: 'Name is required', trigger: ['input', 'blur'] }],
+  name: [{ required: true, message: t('doctors.validation.name'), trigger: ['input', 'blur'] }],
   email: [
-    { required: true, message: 'Email is required', trigger: ['input', 'blur'] },
-    { type: 'email', message: 'Invalid email', trigger: ['input', 'blur'] }
+    { required: true, message: t('doctors.validation.email'), trigger: ['input', 'blur'] },
+    { type: 'email', message: t('doctors.validation.invalidEmail'), trigger: ['input', 'blur'] }
   ],
-  sheet_identifier: [{ required: true, message: 'The sheet identifier is required', trigger: ['input', 'blur'] }],
+  sheet_identifier: [{ required: true, message: t('doctors.validation.sheet'), trigger: ['input', 'blur'] }],
   password: editingUserId.value
-    ? [] // optional on edit
-    : [{ required: true, min: 6, message: 'Password must be at least 6 characters', trigger: ['input', 'blur'] }],
+    ? []
+    : [{ required: true, min: 6, message: t('doctors.validation.passwordLength'), trigger: ['input', 'blur'] }],
   password_confirmation: editingUserId.value
-    ? [] // optional on edit
+    ? []
     : [{
         validator: (rule, value) => value === newUser.value.password,
-        message: 'Passwords do not match',
+        message: t('doctors.validation.passwordMatch'),
         trigger: ['input', 'blur']
       }]
 }))
 
-
 const columns = [
-  { title: 'Name', key: 'name' },
-  { title: 'Email', key: 'email' },
-  
+  { title: t('doctors.name'), key: 'name' },
+  { title: t('doctors.email'), key: 'email' },
   {
-    title: 'Actions',
+    title: t('doctors.delete'),
     key: 'actions',
     render(row) {
       return h('div', { style: 'display: flex; gap: 8px;' }, [
         h(NButton, {
           size: 'small', type: 'info', secondary: true,
           onClick: () => openEditUserModal(row)
-        }, { default: () => 'Edit' }),
+        }, { default: () => t('doctors.edit') }),
 
         h(NButton, {
           size: 'small', type: 'primary', secondary: true,
           onClick: () => viewPrescriptions(row.id)
-        }, { default: () => 'Prescriptions' }),
+        }, { default: () => t('doctors.prescriptions') }),
 
         h(NButton, {
           size: 'small', type: 'error', secondary: true,
           onClick: () => deleteUser(row.id)
-        }, { default: () => 'Delete' })
+        }, { default: () => t('doctors.delete') })
       ])
     }
   }
@@ -176,7 +166,7 @@ const fetchUsers = async () => {
     const response = await axios.get('/users')
     users.value = response.data
   } catch (error) {
-    message.error('Failed to load users')
+    message.error(t('doctors.errorLoad'))
   } finally {
     loading.value = false
   }
@@ -199,16 +189,16 @@ const submitAddUser = async () => {
 
     if (editingUserId.value) {
       await axios.put(`/users/${editingUserId.value}`, payload)
-      message.success('User updated successfully!')
+      message.success(t('doctors.updateSuccess'))
     } else {
       await axios.post('/users', { ...payload, is_admin: false })
-      message.success('User added successfully!')
+      message.success(t('doctors.addSuccess'))
     }
 
     showAddUserModal.value = false
     fetchUsers()
   } catch (error) {
-    message.error('Failed to save user')
+    message.error(t('doctors.errorSave'))
   } finally {
     addingUser.value = false
   }
@@ -228,19 +218,19 @@ const openEditUserModal = (user) => {
 
 const deleteUser = (id) => {
   dialog.warning({
-    title: 'Delete User',
-    content: 'Are you sure you want to delete this user? This action cannot be undone.',
-    positiveText: 'Delete',
-    negativeText: 'Cancel',
+  title: t('doctors.deleteTitle'),
+  content: t('doctors.deleteConfirm'),
+  positiveText: t('doctors.delete'),
+  negativeText: t('doctors.cancel'),
     positiveButtonProps: { type: 'error' },
     icon: () => h(AlertCircleOutline, { style: 'color: red; font-size: 22px;' }),
     onPositiveClick: async () => {
       try {
         await axios.delete(`/users/${id}`)
-        message.success('User deleted successfully!')
+        message.success(t('doctors.deleteSuccess'))
         fetchUsers()
       } catch {
-        message.error('Failed to delete user')
+        message.error(t('doctors.errorDelete'))
       }
     }
   })
