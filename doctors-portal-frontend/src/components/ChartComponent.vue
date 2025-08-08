@@ -8,22 +8,24 @@
 import { ref } from 'vue'
 import ApexCharts from 'apexcharts'
 import VueApexCharts from 'vue3-apexcharts'
+import { useI18n } from 'vue-i18n'
 
 const apexchart = VueApexCharts
+const { t } = useI18n()
 
 const chartSeries = ref([
   {
-    name: 'Orders',
+    name: t('chart.orders'),
     type: 'area',
     data: [55, 62, 48, 44, 70, 52, 61, 50]
   },
   {
-    name: 'Earnings',
+    name: t('chart.earnings'),
     type: 'bar',
     data: [80, 85, 60, 30, 90, 45, 85, 40]
   },
   {
-    name: 'Refunds',
+    name: t('chart.refunds'),
     type: 'line',
     data: [20, 18, 12, 10, 11, 25, 15, 30]
   }

@@ -1,15 +1,15 @@
 <template>
-  <n-card title="Manage Admins">
+  <n-card :title="$t('adminUsers.title')">
     <!-- Search + Add -->
     <n-space justify="space-between" align="center" class="mb-4">
       <n-input
         v-model:value="searchTerm"
-        placeholder="Search users..."
+        :placeholder="$t('adminUsers.searchPlaceholder')"
         clearable
         style="max-width: 300px"
       />
       <n-button type="primary" @click="showAddUserModal = true">
-        Add User
+        {{ $t('adminUsers.addUser') }}
       </n-button>
     </n-space>
 
@@ -42,7 +42,9 @@
       style="width: 500px;"
     >
       <template #header>
-        <h2 class="text-lg font-bold m-0">{{ editingUserId ? 'Edit User' : 'Add New Admin' }}</h2>
+        <h2 class="text-lg font-bold m-0">
+          {{ editingUserId ? $t('adminUsers.editUser') : $t('adminUsers.addNewAdmin') }}
+        </h2>     
       </template>
 
       <n-form
@@ -52,36 +54,37 @@
         label-width="120px"
         size="large"
       >
-        <n-form-item label="Name" path="name">
-          <n-input v-model:value="newUser.name" placeholder="User name" />
+        <n-form-item :label="$t('adminUsers.name')" path="name">
+          <n-input v-model:value="newUser.name" :placeholder="$t('adminUsers.name')" />
         </n-form-item>
 
-        <n-form-item label="Email" path="email">
-          <n-input v-model:value="newUser.email" placeholder="User email" />
+        <n-form-item :label="$t('adminUsers.email')" path="email">
+          <n-input v-model:value="newUser.email" :placeholder="$t('adminUsers.email')" />
         </n-form-item>
 
-        <n-form-item label="Password" path="password">
+        <n-form-item :label="$t('adminUsers.password')" path="password">
           <n-input
             v-model:value="newUser.password"
             type="password"
-            placeholder="Password"
+            :placeholder="$t('adminUsers.password')"
             show-password-on="click"
-          />
+        />
         </n-form-item>
 
-        <n-form-item label="Confirm Password" path="password_confirmation">
+        <n-form-item :label="$t('adminUsers.confirmPassword')" path="password_confirmation">
           <n-input
             v-model:value="newUser.password_confirmation"
             type="password"
-            placeholder="Confirm Password"
+            :placeholder="$t('adminUsers.confirmPassword')"
             show-password-on="click"
-          />
+        />
         </n-form-item>
 
+
         <n-space justify="end" class="mt-6">
-          <n-button @click="showAddUserModal = false">Cancel</n-button>
+          <n-button @click="showAddUserModal = false">{{ $t('adminUsers.cancel') }}</n-button>
           <n-button type="primary" :loading="addingUser" @click="submitAddUser">
-            Save
+            {{ $t('adminUsers.save') }}
           </n-button>
         </n-space>
       </n-form>
@@ -98,6 +101,9 @@ import {
 } from 'naive-ui'
 import { AlertCircleOutline } from '@vicons/ionicons5'
 import axios from '@/api/axios'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const users = ref([])
 const loading = ref(false)
@@ -116,40 +122,40 @@ const newUser = ref({
 })
 
 const rules = {
-  name: [{ required: true, message: 'Name is required', trigger: ['input', 'blur'] }],
+  name: [{ required: true, message: t('adminUsers.validation.name'), trigger: ['input', 'blur'] }],
   email: [
-    { required: true, message: 'Email is required', trigger: ['input', 'blur'] },
-    { type: 'email', message: 'Invalid email', trigger: ['input', 'blur'] }
+    { required: true, message: t('adminUsers.validation.email'), trigger: ['input', 'blur'] },
+    { type: 'email', message: t('adminUsers.validation.invalidEmail'), trigger: ['input', 'blur'] }
   ],
   password: [
-    { required: false, min: 6, message: 'Password must be at least 6 characters', trigger: ['input', 'blur'] }
+    { required: false, min: 6, message: t('adminUsers.validation.passwordLength'), trigger: ['input', 'blur'] }
   ],
   password_confirmation: [
     {
       validator: (rule, value) => value === newUser.value.password,
-      message: 'Passwords do not match',
+      message: t('adminUsers.validation.passwordMatch'),
       trigger: ['input', 'blur']
     }
   ]
 }
 
 const columns = [
-  { title: 'Name', key: 'name' },
-  { title: 'Email', key: 'email' },
+   { title: t('adminUsers.name'), key: 'name' },
+  { title: t('adminUsers.email'), key: 'email' },
   {
-    title: 'Actions',
+    title: t('adminUsers.delete'),
     key: 'actions',
     render(row) {
       return h('div', { style: 'display: flex; gap: 8px;' }, [
         h(NButton, {
           size: 'small', type: 'info', secondary: true,
           onClick: () => openEditUserModal(row)
-        }, { default: () => 'Edit' }),
+        }, { default: () => t('adminUsers.edit') }),
 
         h(NButton, {
           size: 'small', type: 'error', secondary: true,
           onClick: () => deleteUser(row.id)
-        }, { default: () => 'Delete' })
+        }, { default: () => t('adminUsers.delete') })
       ])
     }
   }
@@ -161,7 +167,7 @@ const fetchUsers = async () => {
     const response = await axios.get('users/admins')
     users.value = response.data
   } catch (error) {
-    message.error('Failed to load users')
+    message.error(t('adminUsers.errorLoad'))
   } finally {
     loading.value = false
   }
@@ -183,16 +189,16 @@ const submitAddUser = async () => {
 
     if (editingUserId.value) {
       await axios.put(`/users/${editingUserId.value}`, payload)
-      message.success('User updated successfully!')
+      message.success(t('adminUsers.updateSuccess'))
     } else {
       await axios.post('/users/admins', payload)
-      message.success('User added successfully!')
+      message.success(t('adminUsers.addSuccess'))
     }
 
     showAddUserModal.value = false
     fetchUsers()
   } catch (error) {
-    message.error('Failed to save user')
+    message.error(t('adminUsers.errorSave'))
   } finally {
     addingUser.value = false
   }
@@ -211,16 +217,16 @@ const openEditUserModal = (user) => {
 
 const deleteUser = (id) => {
   dialog.warning({
-    title: 'Delete User',
-    content: 'Are you sure you want to delete this user?',
-    positiveText: 'Delete',
-    negativeText: 'Cancel',
+    title: t('adminUsers.deleteTitle'),
+    content: t('adminUsers.deleteConfirm'),
+    positiveText: t('adminUsers.delete'),
+    negativeText: t('adminUsers.cancel'),
     positiveButtonProps: { type: 'error' },
     icon: () => h(AlertCircleOutline, { style: 'color: red; font-size: 22px;' }),
     onPositiveClick: async () => {
       try {
         await axios.delete(`/users/${id}`)
-        message.success('User deleted successfully!')
+        message.success(t('adminUsers.deleteSuccess'))
         fetchUsers()
       } catch {
         message.error('Failed to delete user')

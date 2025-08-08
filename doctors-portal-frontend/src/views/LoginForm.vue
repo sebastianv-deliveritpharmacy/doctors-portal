@@ -1,7 +1,6 @@
-<!-- LoginPage.vue -->
 <template>
   <div class="login-container">
-    <n-card title="Login" hoverable class="login-card">
+    <n-card :title="$t('login.title')" hoverable class="login-card">
       <n-form
         ref="formRef"
         :model="formValue"
@@ -9,19 +8,19 @@
         size="large"
         @submit.prevent="login"
       >
-        <n-form-item path="email" label="Email">
+        <n-form-item path="email" :label="$t('login.email')">
           <n-input
             v-model:value="formValue.email"
-            placeholder="Enter your email"
+            :placeholder="$t('login.emailPlaceholder')"
             @keydown.enter.prevent
           />
         </n-form-item>
 
-        <n-form-item path="password" label="Password">
+        <n-form-item path="password" :label="$t('login.password')">
           <n-input
             v-model:value="formValue.password"
             type="password"
-            placeholder="Enter your password"
+            :placeholder="$t('login.passwordPlaceholder')"
             show-password-on="click"
             @keydown.enter.prevent
           />
@@ -29,9 +28,9 @@
 
         <n-space vertical :size="24">
           <div style="display: flex; justify-content: space-between;">
-            <n-checkbox v-model:checked="rememberMe">Remember me</n-checkbox>
+            <n-checkbox v-model:checked="rememberMe">{{ $t('login.rememberMe') }}</n-checkbox>
             <n-button text @click="router.push('/forgot-password')">
-              Forgot password?
+              {{ $t('login.forgotPassword') }}
             </n-button>
           </div>
 
@@ -43,14 +42,13 @@
             attr-type="submit"
             style="background-color: #2080f0;"
           >
-            Sign in
+            {{ $t('login.signIn') }}
           </n-button>
         </n-space>
       </n-form>
     </n-card>
   </div>
 </template>
-
 <script setup>
 import { ref, onMounted } from 'vue'
 import {
@@ -67,6 +65,9 @@ import { useRouter } from 'vue-router'
 import axios from '@/api/axios'
 import { apiRoutes } from '@/api/apiRoutes'
 import { useUserStore } from '@/stores/useUser'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const userStore = useUserStore()
 const formRef = ref(null)
@@ -79,28 +80,29 @@ const formValue = ref({
   password: ''
 })
 
+// ✅ Use t() instead of $t here
 const rules = {
   email: [
     {
       required: true,
-      message: 'Please input your email',
+      message: t('login.loginMsg.emailMsg'),
       trigger: ['input', 'blur']
     },
     {
       type: 'email',
-      message: 'Please enter a valid email address',
+      message: t('login.loginMsg.emailMsgValid'),
       trigger: ['input', 'blur']
     }
   ],
   password: [
     {
       required: true,
-      message: 'Please input your password',
+      message: t('login.loginMsg.emailPwd'),
       trigger: ['input', 'blur']
     },
     {
       min: 6,
-      message: 'Password must be at least 6 characters',
+      message: t('login.loginMsg.emailPwdCh'),
       trigger: ['input', 'blur']
     }
   ]
@@ -115,7 +117,6 @@ const login = async () => {
       password: formValue.value.password,
     });
 
-    // Handle "remember me"
     if (rememberMe.value) {
       localStorage.setItem('remember_me_email', formValue.value.email)
       localStorage.setItem('remember_me_password', formValue.value.password)
@@ -135,7 +136,7 @@ const login = async () => {
       router.push('/dashboard')
     }
   } catch (error) {
-    let errorMessage = 'Login failed, please check your credentials'
+    let errorMessage = t('login.errorMessage')
 
     if (error?.response?.data?.errors) {
       const firstErrorKey = Object.keys(error.response.data.errors)[0]
@@ -146,10 +147,6 @@ const login = async () => {
 
     message.error(errorMessage)
   }
-}
-
-const handleForgotPassword = () => {
-  message.info('Password reset functionality would go here')
 }
 
 onMounted(() => {
@@ -163,6 +160,7 @@ onMounted(() => {
   }
 })
 </script>
+
 
 <style scoped>
 .login-container {

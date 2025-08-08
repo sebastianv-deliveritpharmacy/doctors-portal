@@ -1,8 +1,8 @@
 <template>
   <div class="dashboard-container">
     <div class="greeting-card">
-      <h2 class="greeting-text">Hello, {{ user.name }}</h2>
-      <div class="subtext">Track your activity and progress below.</div>
+      <h2 class="greeting-text">{{ $t('dashboard.greeting', { name: user.name }) }}</h2>
+      <div class="subtext">{{ $t('dashboard.subtext') }}</div>
       <div class="stats-overview">
         <div v-for="card in cards" :key="card.title" class="stat-card">
           <div class="card-top">
@@ -54,45 +54,48 @@ import ChartComponent from '@/components/ChartComponent.vue'
 import PieChart from '@/components/PieChart.vue'
 import { getCurrentUser } from '@/api/user'
 import { fetchDashboardStats } from '@/api/dashboard'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const user = ref({ name: '', email: '' })
 
 const cards = ref([
   {
-    title: 'Active Doctors',
+    title: t('dashboard.cards.doctors.title'),
     value: 0,
     change: 0,
     icon: Users,
     iconBg: '#00B140',
     link: '#',
-    linkText: 'See doctors'
+    linkText: t('dashboard.cards.doctors.linkText')
   },
   {
-    title: 'Prescriptions Today',
+    title: t('dashboard.cards.prescriptions.title'),
     value: 0,
     change: 0,
     icon: ShoppingBag,
     iconBg: '#0073e6',
     link: '#',
-    linkText: 'View all'
+    linkText: t('dashboard.cards.prescriptions.linkText')
   },
   {
-    title: 'Completed Today',
+    title: t('dashboard.cards.completed.title'),
     value: 0,
     change: 0,
     icon: 'checkmark',
     iconBg: '#f59e0b',
     link: '#',
-    linkText: 'Check completed'
+    linkText: t('dashboard.cards.completed.linkText')
   },
   {
-    title: 'This Month',
+    title: t('dashboard.cards.month.title'),
     value: 0,
     change: 0,
     icon: CreditCard,
     iconBg: '#9b59b6',
     link: '#',
-    linkText: 'Monthly stats'
+    linkText: t('dashboard.cards.month.linkText')
   }
 ])
 

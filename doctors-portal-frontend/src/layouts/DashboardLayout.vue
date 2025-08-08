@@ -53,7 +53,7 @@
         "
       >
         <div style="font-size: 18px; font-weight: bold; letter-spacing: 0.5px; color: #333; margin-bottom: 10px;">
-          Partnered With
+          {{ $t('layout.partners') }}
         </div>
         <div style="display: flex; gap: 8px; justify-content: center;">
           <a href="https://deliveritpharmacy.com" target="_blank" rel="noopener">
@@ -92,6 +92,9 @@ import {
 } from '@vicons/ionicons5'
 import axios from '@/api/axios'
 import { useUserStore } from '@/stores/useUser'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const userStore = useUserStore()
 const router = useRouter()
@@ -122,87 +125,87 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', checkMobile)
 })
 
-const superAdminMenu = [
+const superAdminMenu = computed(() => [
   {
-    label: 'Dashboard',
+    label: t('layout.menu.dashboard'),
     key: 'dashboard',
     to: '/dashboard',
     icon: renderIcon(BookOutline)
   },
-   {
-    label: 'Admins',
+  {
+    label: t('layout.menu.admins'),
     key: 'admins',
     to: '/dashboard/admins',
     icon: renderIcon(PeopleOutline)
   },
   {
-    label: 'Doctors',
+    label: t('layout.menu.doctors'),
     key: 'doctors',
     to: '/dashboard/doctors',
     icon: renderIcon(PeopleCircleOutline)
   },
   {
-    label: 'Profile',
+    label: t('layout.menu.profile'),
     key: 'profile',
     to: '/dashboard/profile',
     icon: renderIcon(PersonOutline)
   },
   {
-    label: 'Settings',
+    label: t('layout.menu.settings'),
     key: 'settings',
     to: '/dashboard/settings',
     icon: renderIcon(SettingsOutline)
   },
   {
-    label: 'Logout',
+    label: t('layout.menu.logout'),
     key: 'logout',
     to: '/logout',
     icon: renderIcon(LogOutOutline)
   }
-]
+])
 
-const adminMenu = [
+const adminMenu = computed(() => [
   {
-    label: 'Dashboard',
+    label: t('layout.menu.dashboard'),
     key: 'dashboard',
     to: '/dashboard',
     icon: renderIcon(BookOutline)
   },
   {
-    label: 'Doctors',
+    label: t('layout.menu.doctors'),
     key: 'doctors',
     to: '/dashboard/doctors',
     icon: renderIcon(PeopleOutline)
   },
   {
-    label: 'Profile',
+    label: t('layout.menu.profile'),
     key: 'profile',
     to: '/dashboard/profile',
     icon: renderIcon(PersonOutline)
   },
   {
-    label: 'Settings',
+    label: t('layout.menu.settings'),
     key: 'settings',
     to: '/dashboard/settings',
     icon: renderIcon(SettingsOutline)
   },
   {
-    label: 'Logout',
+    label: t('layout.menu.logout'),
     key: 'logout',
     to: '/logout',
     icon: renderIcon(LogOutOutline)
   }
-]
+])
 
-const userMenu = [
+const userMenu = computed(() => [
   {
-    label: 'Dashboard',
+    label: t('layout.menu.dashboard'),
     key: 'dashboard',
     to: '/dashboard',
     icon: renderIcon(BookOutline)
   },
   {
-    label: 'Profile',
+    label: t('layout.menu.profile'),
     key: 'profile',
     to: '/dashboard/profile',
     icon: renderIcon(PersonOutline)
@@ -215,19 +218,26 @@ const userMenu = [
     target: '_blank'
   },
   {
-    label: 'Logout',
+    label: t('layout.menu.settings'),
+    key: 'settings',
+    to: '/dashboard/settings',
+    icon: renderIcon(SettingsOutline)
+  },
+  {
+    label: t('layout.menu.logout'),
     key: 'logout',
     to: '/dashboard/logout',
     icon: renderIcon(LogOutOutline)
   }
-]
+])
 
 
 const menuOptions = computed(() => {
-  if (userStore.isSuperAdmin()) return superAdminMenu
-  if (userStore.isAdmin()) return adminMenu
-  return userMenu
+  if (userStore.isSuperAdmin()) return superAdminMenu.value
+  if (userStore.isAdmin()) return adminMenu.value
+  return userMenu.value
 })
+
 
 function renderIcon(icon) {
   return () => h(NIcon, null, { default: () => h(icon) })
@@ -285,7 +295,7 @@ const logout = async () => {
     router.push('/')
   } catch (error) {
     console.error('Logout failed', error?.response?.data || error.message)
-    message.error('Failed to logout')
+    message.error(t('layout.logoutError'))
   }
 }
 </script>

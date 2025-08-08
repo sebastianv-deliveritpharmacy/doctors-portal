@@ -12,6 +12,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+     "allowJs": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "isolatedModules": false
   }
 }
