@@ -1,0 +1,1 @@
+const s="http://142.93.198.136:8000/api",t={register:`${s}/register`,signUp:`${s}/sign-up`,login:`${s}/login`,logout:`${s}/logout`,forgotPassword:`${s}/forgot-password`,users:{list:`${s}/users`,create:`${s}/users`,detail:e=>`${s}/users/${e}`,update:e=>`${s}/users/${e}`,delete:e=>`${s}/users/${e}`}};export{t as a};

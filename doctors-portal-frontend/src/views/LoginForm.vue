@@ -27,11 +27,19 @@
         </n-form-item>
 
         <n-space vertical :size="24">
-          <div style="display: flex; justify-content: space-between;">
-            <n-checkbox v-model:checked="rememberMe">{{ $t('login.rememberMe') }}</n-checkbox>
-            <n-button text @click="router.push('/forgot-password')">
-              {{ $t('login.forgotPassword') }}
-            </n-button>
+          <div class="login-links">
+            <n-checkbox v-model:checked="rememberMe">
+              {{ $t('login.rememberMe') }}
+            </n-checkbox>
+
+            <n-space size="small" justify="end">
+              <n-button text @click="router.push('/forgot-password')">
+                {{ $t('login.forgotPassword') }}
+              </n-button>
+              <n-button text @click="router.push('/sign-up')">
+                {{ $t('login.signUp') }}
+              </n-button>
+            </n-space>
           </div>
 
           <n-button
@@ -45,6 +53,7 @@
             {{ $t('login.signIn') }}
           </n-button>
         </n-space>
+
       </n-form>
     </n-card>
   </div>
@@ -176,4 +185,23 @@ onMounted(() => {
   max-width: 400px;
   margin: 0 auto;
 }
+
+.login-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px 24px; /* Extra breathing room */
+}
+
+.n-button[text] {
+  padding: 0 8px;
+}
+
 </style>

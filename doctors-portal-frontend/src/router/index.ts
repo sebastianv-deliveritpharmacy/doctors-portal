@@ -71,6 +71,11 @@ const routes: RouteRecordRaw[] = [
     name: 'Forgot Password',
     component: () => import('@/views/ForgotPassword.vue'),
   },
+   {
+    path: '/sign-up',
+    name: 'Sign Up',
+    component: () => import('@/views/SignUpForm.vue'),
+  },
   {
     path: '/reset-password/:token',
     name: 'Reseet Password',

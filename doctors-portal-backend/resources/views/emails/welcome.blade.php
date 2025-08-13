@@ -104,8 +104,12 @@
     </h2>
 
     <p class="subtext" style="color:#4b5563; font-size:14px; line-height:1.6; margin-bottom:24px;">
-      Thanks for joining <strong>DeliverIt Portal</strong> — we’re excited to have you on board. 
-      Your account has been created successfully.
+      @if(!empty($isAdmin) && $isAdmin)
+        Your account has <strong>admin privileges</strong>. You can manage users, settings, and more.
+      @else
+        Thanks for joining <strong>DeliverIt Portal</strong> — we’re excited to have you on board.
+        Your account has been created successfully.
+      @endif
     </p>
 
     <p style="margin: 0 0 20px 0;">
@@ -119,9 +123,20 @@
 
     <div class="features" style="text-align:left; margin:24px 0; padding:0 6px;">
       <h3 style="color:#1f2937; font-size:16px; margin-bottom:8px;">What you can do:</h3>
-      <ul style="padding-left:18px; margin:0; color:#4b5563; line-height:1.6; font-size:14px;">
-        <li>Track prescription status in real time.</li>
-      </ul>
+
+      @if(!empty($features) && is_array($features))
+        <ul style="padding-left:18px; margin:0; color:#4b5563; line-height:1.6; font-size:14px;">
+          @foreach($features as $item)
+            <li>{{ $item }}</li>
+          @endforeach
+        </ul>
+      @else
+        <ul style="padding-left:18px; margin:0; color:#4b5563; line-height:1.6; font-size:14px;">
+          <li>Track prescription status in real time.</li>
+          <li>Access patient updates and reports.</li>
+          <li>Manage your clinic’s information securely.</li>
+        </ul>
+      @endif
     </div>
 
     <p class="subtext" style="color:#4b5563; font-size:14px; line-height:1.6; margin-bottom:0;">
