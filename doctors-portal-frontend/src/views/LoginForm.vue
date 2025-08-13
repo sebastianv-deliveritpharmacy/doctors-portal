@@ -32,7 +32,7 @@
               {{ $t('login.rememberMe') }}
             </n-checkbox>
 
-            <n-space size="small" justify="end">
+            <n-space size="small" justify="end" style="width: 50%;">
               <n-button text @click="router.push('/forgot-password')">
                 {{ $t('login.forgotPassword') }}
               </n-button>
@@ -190,7 +190,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 0px;
 }
 
 .login-card {
