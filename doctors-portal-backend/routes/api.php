@@ -22,6 +22,7 @@ use App\Http\Controllers\DashboardController;
 
 
 Route::post('register', [AuthController::class, 'register']);
+Route::post('sign-up', [UserController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail']);
 Route::post('/reset-password', [AuthController::class, 'reset']);

@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Log;
+
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -82,46 +84,67 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
 
-    public function sendEmailVerificationNotification()
+public function sendEmailVerificationNotification()
     {
+                Log::info('Step 1');
+
         $verificationUrl = URL::temporarySignedRoute(
             'verification.verify',
             now()->addMinutes(60),
             ['id' => $this->id, 'hash' => sha1($this->email)]
         );
 
-        // Render Blade view to HTML
-        $htmlContent = (new \App\Mail\VerifyEmailCustom($this, $verificationUrl))->render();
+        Log::info('Verification URL generated:', ['url' => $verificationUrl]);
 
+        $htmlContent = (new \App\Mail\VerifyEmailCustom($this, $verificationUrl))->render();
+        Log::info('Email HTML content generated.');
 
         $accessToken = $this->getGraphAccessToken();
+        Log::info('Access Token retrieved.');
 
         $client = new Client();
 
-        $client->post('https://graph.microsoft.com/v1.0/users/ITdeliveritgroup@deliveritpharmacy.com/sendMail', [
-            'headers' => [
-                'Authorization' => "Bearer $accessToken",
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'message' => [
-                    'subject' => 'Verify Your Email Address',
-                    'body' => [
-                        'contentType' => 'HTML',
-                        'content' => $htmlContent,
+        try {
+            $response = $client->post(
+                'https://graph.microsoft.com/v1.0/users/ITdeliveritgroup@deliveritpharmacy.com/sendMail',
+                [
+                    'headers' => [
+                        'Authorization' => "Bearer $accessToken",
+                        'Content-Type'  => 'application/json',
                     ],
-                    'toRecipients' => [
-                        [
-                            'emailAddress' => [
-                                'address' => $this->email,
+                    'json' => [
+                        'message' => [
+                            'subject' => 'Verify Your Email Address',
+                            'body'    => [
+                                'contentType' => 'HTML',
+                                'content'     => $htmlContent,
+                            ],
+                            'toRecipients' => [
+                                [
+                                    'emailAddress' => [
+                                        'address' => $this->email,
+                                    ],
+                                ],
                             ],
                         ],
+                        'saveToSentItems' => true,
                     ],
-                ],
-                'saveToSentItems' => true,
-            ],
-        ]);
+                ]
+            );
+
+            Log::info('Microsoft Graph email send response:', [
+                'status' => $response->getStatusCode(),
+                'body'   => (string) $response->getBody(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error sending verification email:', [
+                'message' => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
+            ]);
+        }
     }
+
+
 
 
     public function shipmentUpdates()

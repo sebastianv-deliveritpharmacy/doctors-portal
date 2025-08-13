@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Traits\HasRoles;
 use GuzzleHttp\Client;
+use App\Mail\WelcomeMail;
+use Illuminate\Support\Facades\DB; // <-- add this at the top of UserController
+
 
 class UserController extends Controller
 {
@@ -33,10 +34,86 @@ class UserController extends Controller
         ]);
 
         $user->assignRole('doctor');
-        $user->sendEmailVerificationNotification();
+
+         // If you also want a welcome email via Graph:
+            $features = [
+                    'Track prescription status in real time',
+                ];
+
+                $welcome = new \App\Mail\WelcomeMail(
+                    $user->name,
+                    'https://deliveritpharmacy.com/wp-content/uploads/2024/04/DeliverIt-Hero.jpg',
+                    'https://portal.deliveritgroup.us/admin', // admin landing (adjust if needed)
+                    $features,
+                    false // isAdmin
+                );
+            // Render Blade -> HTML string:
+            $htmlContent = $welcome->render();
+
+            // Send via Graph with HTML:
+            $this->sendGraphEmail(
+                $user->email,
+                'Welcome to DeliverIt Portal | DeliverIt Health',
+                $htmlContent
+            );
+        // $user->sendEmailVerificationNotification();
 
         return response()->json($user, 201);
     }
+
+
+    public function register(Request $request)
+    {
+        $validated = $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
+        ]);
+
+        $user = DB::transaction(function () use ($validated) {
+            $user = User::create([
+                'name'     => $validated['name'],
+                'email'    => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
+
+            $user->assignRole('doctor');
+
+            // If you want verification, uncomment:
+            // $user->sendEmailVerificationNotification();
+
+            // If you also want a welcome email via Graph:
+            $features = [
+                    'Track prescription status in real time',
+                ];
+
+                $welcome = new \App\Mail\WelcomeMail(
+                    $user->name,
+                    'https://deliveritpharmacy.com/wp-content/uploads/2024/04/DeliverIt-Hero.jpg',
+                    'https://portal.deliveritgroup.us/admin', // admin landing (adjust if needed)
+                    $features,
+                    false // isAdmin
+                );
+            // Render Blade -> HTML string:
+            $htmlContent = $welcome->render();
+
+            // Send via Graph with HTML:
+            $this->sendGraphEmail(
+                $user->email,
+                'Welcome to DeliverIt Portal | DeliverIt Health',
+                $htmlContent
+            );
+
+            return $user;
+        });
+
+        // If you DID send a verification email, keep this:
+        return response()->json(['message' => 'Account created. Please verify your email.'], 201);
+
+        // If you did NOT send verification (and only sent welcome), return success instead:
+        // return response()->json(['success' => true], 201);
+    }
+
 
     public function show(User $user)
     {
@@ -84,18 +161,49 @@ class UserController extends Controller
             'password' => 'required|min:6|confirmed',
         ]);
 
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        $user = null;
 
-        // Assign the 'admin' role to the user with the correct guard
-        $user->assignRole('admin');
+        DB::transaction(function () use ($request, &$user) {
+            $user = User::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+
+            $user->assignRole('admin');
+        });
+
+        DB::afterCommit(function () use ($user) {
+            try {
+                $features = [
+                    'Create new users',
+                    'Edit prescriptions',
+                    'Admin settings',
+                ];
+
+                $welcome = new \App\Mail\WelcomeMail(
+                    $user->name,
+                    'https://deliveritpharmacy.com/wp-content/uploads/2024/04/DeliverIt-Hero.jpg',
+                    'https://portal.deliveritgroup.us/admin', // admin landing (adjust if needed)
+                    $features,
+                    true // isAdmin
+                );
+
+                $html = $welcome->render();
+
+                $this->sendGraphEmail(
+                    $user->email,
+                    'Welcome Admin — DeliverIt Portal',
+                    $html
+                );
+            } catch (\Throwable $e) {
+                \Log::error('Admin welcome email failed', ['message' => $e->getMessage()]);
+            }
+        });
 
         return response()->json([
             'message' => 'Admin user created successfully',
-            'user' => $user
+            'user'    => $user
         ], 201);
     }
 
@@ -119,33 +227,45 @@ class UserController extends Controller
     private function sendGraphEmail($toEmail, $subject, $body)
     {
         $accessToken = $this->getGraphAccessToken();
-
         $client = new Client();
 
-        $client->post('https://graph.microsoft.com/v1.0/users/ITdeliveritgroup@deliveritpharmacy.com/sendMail', [
-            'headers' => [
-                'Authorization' => "Bearer $accessToken",
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'message' => [
-                    'subject' => $subject,
-                    'body' => [
-                        'contentType' => 'Text',
-                        'content' => $body,
-                    ],
-                    'toRecipients' => [
-                        [
-                            'emailAddress' => [
-                                'address' => $toEmail,
+        try {
+            $response = $client->post('https://graph.microsoft.com/v1.0/users/ITdeliveritgroup@deliveritpharmacy.com/sendMail', [
+                'headers' => [
+                    'Authorization' => "Bearer $accessToken",
+                    'Content-Type'  => 'application/json',
+                ],
+                'json' => [
+                    'message' => [
+                        'subject' => $subject,
+                        'body' => [
+                            'contentType' => 'HTML',   // ✅ was "Text"
+                            'content'     => $body,
+                        ],
+                        'toRecipients' => [
+                            [
+                                'emailAddress' => [
+                                    'address' => $toEmail,
+                                ],
                             ],
                         ],
                     ],
+                    'saveToSentItems' => true,
                 ],
-                'saveToSentItems' => true,
-            ],
-        ]);
+            ]);
+
+            \Log::info('Graph sendMail OK', [
+                'status' => $response->getStatusCode(),
+                'body'   => (string) $response->getBody()
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Graph sendMail failed', [
+                'message' => $e->getMessage(),
+            ]);
+            throw $e; // rethrow if you want to fail the request
+        }
     }
+
 
 
 

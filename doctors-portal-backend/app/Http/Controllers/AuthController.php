@@ -30,8 +30,10 @@ class AuthController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'is_admin' => false
         ]);
+
+        $user->assignRole('doctor');
+
 
         return response()->json(['message' => 'Account created. Please verify your email.'], 201);
     }

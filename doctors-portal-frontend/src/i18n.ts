@@ -283,6 +283,7 @@ const messages = {
       passwordPlaceholder: "Enter your password",
       rememberMe: "Remember me",
       forgotPassword: "Forgot password?",
+      signUp: "Create an account",
       signIn: "Sign in",
       loginMsg: {
         emailMsg : "Please input your email",
@@ -325,7 +326,35 @@ const messages = {
       confirmed: 'Confirmed Prescription Received',
       production: 'Production',
       unknown: 'Unknown',
+    },
+    signup: {
+    title: "Create your account",
+    name: "Full Name",
+    namePlaceholder: "Your full name",
+    email: "Email",
+    emailPlaceholder: "you@example.com",
+    password: "Password",
+    passwordPlaceholder: "Enter a password",
+    passwordConfirm: "Confirm Password",
+    passwordConfirmPlaceholder: "Re-enter your password",
+    acceptTermsHtml: "I accept the <a href='/terms' target='_blank'>Terms</a> & <a href='/privacy' target='_blank'>Privacy Policy</a>",
+    haveAccount: "Already have an account?",
+    createAccount: "Create Account",
+    msg: {
+      nameRequired: "Please enter your name.",
+      nameMin: "Name must be at least 2 characters.",
+      emailRequired: "Please enter your email.",
+      emailInvalid: "Please enter a valid email.",
+      passwordRequired: "Please enter a password.",
+      passwordMin: "Password must be at least 6 characters.",
+      passwordsMustMatch: "Passwords must match.",
+      acceptTermsFirst: "Please accept the terms to continue.",
+      checkEmail: "We’ve sent you a verification email. Please check your inbox.",
+      welcome: "Welcome, {name}!",
+      success: "Account created successfully.",
+      genericError: "We couldn’t create your account. Please try again."
     }
+  }
 
   },
   es: {
@@ -605,6 +634,7 @@ const messages = {
       passwordPlaceholder: "Ingresa tu contraseña",
       rememberMe: "Recuérdame",
       forgotPassword: "¿Olvidaste tu contraseña?",
+      signUp: "Crea una cuenta",
       signIn: "Iniciar sesión",
       loginMsg: {
         emailMsg: "Por favor, ingresa tu correo electrónico",
@@ -646,8 +676,35 @@ const messages = {
       confirmed: 'Receta Confirmada Recibida',
       production: 'Producción',
       unknown: 'Desconocido',
-    }
-
+    },
+    signup: {
+      title: "Crea tu cuenta",
+      name: "Nombre completo",
+      namePlaceholder: "Tu nombre completo",
+      email: "Correo electrónico",
+      emailPlaceholder: "tucorreo@ejemplo.com",
+      password: "Contraseña",
+      passwordPlaceholder: "Ingresa una contraseña",
+      passwordConfirm: "Confirmar contraseña",
+      passwordConfirmPlaceholder: "Repite tu contraseña",
+      acceptTermsHtml: "Acepto los <a href='/terms' target='_blank'>Términos</a> y la <a href='/privacy' target='_blank'>Política de privacidad</a>",
+      haveAccount: "¿Ya tienes una cuenta?",
+      createAccount: "Crear cuenta",
+      msg: {
+        nameRequired: "Por favor, ingresa tu nombre.",
+        nameMin: "El nombre debe tener al menos 2 caracteres.",
+        emailRequired: "Por favor, ingresa tu correo electrónico.",
+        emailInvalid: "Por favor, ingresa un correo electrónico válido.",
+        passwordRequired: "Por favor, ingresa una contraseña.",
+        passwordMin: "La contraseña debe tener al menos 6 caracteres.",
+        passwordsMustMatch: "Las contraseñas deben coincidir.",
+        acceptTermsFirst: "Por favor, acepta los términos para continuar.",
+        checkEmail: "Te hemos enviado un correo de verificación. Por favor revisa tu bandeja de entrada.",
+        welcome: "¡Bienvenido, {name}!",
+        success: "Cuenta creada con éxito.",
+        genericError: "No pudimos crear tu cuenta. Por favor, inténtalo de nuevo."
+      }
+  }
   }
 }
 
