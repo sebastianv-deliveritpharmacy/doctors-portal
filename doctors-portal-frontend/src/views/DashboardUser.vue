@@ -224,7 +224,10 @@ const columns = computed(() => [
         }
       }
 
-      const config = statusConfig[row.status] || statusConfig.default
+      const config = statusConfig[row.status] || {
+        ...statusConfig.default,
+        label: row.status || 'Unknown'
+      }
 
       return h(NTag, {
         style: {
