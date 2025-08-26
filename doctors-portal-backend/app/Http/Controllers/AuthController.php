@@ -151,19 +151,72 @@ class AuthController extends Controller
         return response()->json($user);
     }
 
-    public function sendResetLinkEmail(Request $request)
-    {
+    // public function sendResetLinkEmail(Request $request)
+    // {
         
-        $request->validate(['email' => 'required|email']);
+    //     $request->validate(['email' => 'required|email']);
 
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+    //     $status = Password::sendResetLink(
+    //         $request->only('email')
+    //     );
 
-        return $status === Password::RESET_LINK_SENT
-            ? response()->json(['message' => 'Reset link sent to your email.'])
-            : response()->json(['message' => 'Unable to send reset link.'], 422);
+    //     return $status === Password::RESET_LINK_SENT
+    //         ? response()->json(['message' => 'Reset link sent to your email.'])
+    //         : response()->json(['message' => 'Unable to send reset link.'], 422);
+    // }
+
+    public function sendResetLinkEmail(Request $request)
+{
+    $request->validate(['email' => 'required|email']);
+
+    // Always return a generic success message to avoid email enumeration
+    $genericOk = response()->json([
+        'message' => 'If an account matches that email, a reset link has been sent.'
+    ]);
+
+    // Find user; if not found, return generic OK without doing anything
+    $user = User::where('email', $request->email)->first();
+    if (!$user) {
+        return $genericOk;
     }
+
+    try {
+        // Create a reset token using Laravel's broker (this also persists it)
+        $token = Password::broker()->createToken($user);
+
+        // Build your front-end reset URL (adjust to your app)
+        // Example uses APP_URL; change to a FRONTEND_URL if you prefer
+        $base = rtrim(config('app.frontend_url', config('app.url')), '/');
+        $resetUrl = 'http://portal.deliveritgroup.us/reset-password?token=' . urlencode($token) . '&email=' . urlencode($user->email);
+
+        // Render HTML (Blade view preferred; fallback to a simple inline template)
+        try {
+            $html = View::make('emails.password_reset', [
+                'name'     => $user->name,
+                'email'    => $user->email,
+                'resetUrl' => $resetUrl,
+            ])->render();
+        } catch (\Throwable $e) {
+            Log::warning('password_reset_view_missing_or_error: ' . $e->getMessage());
+            $html = <<<HTML
+                <p>Hello {$user->name},</p>
+                <p>You requested a password reset for your DeliverIt Health account.</p>
+                <p><a href="{$resetUrl}">Reset your password</a></p>
+                <p>This link will expire according to our standard policy. If you didn’t request this, you can safely ignore this email.</p>
+            HTML;
+        }
+
+        // Send via Microsoft Graph (same pattern as resend2fa)
+        $this->sendGraphMail($user->email, 'Reset your password | DeliverIt Health', $html);
+
+        return $genericOk;
+    } catch (\Throwable $e) {
+        Log::error('password_reset_graph_failed: ' . $e->getMessage());
+        // Keep response generic
+        return $genericOk;
+    }
+}
+
 
     public function reset(Request $request)
     {

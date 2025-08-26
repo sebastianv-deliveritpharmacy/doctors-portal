@@ -51,20 +51,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import {
-  NCard,
-  NForm,
-  NFormItem,
-  NInput,
-  NButton,
-  useMessage,
-} from 'naive-ui'
+import { NCard, NForm, NFormItem, NInput, NButton, useMessage } from 'naive-ui'
 import axios from '@/api/axios'
 
 const route = useRoute()
-const router = useRouter()
+const router  = useRouter()
 const formRef = ref(null)
 const message = useMessage()
 const loading = ref(false)
@@ -86,18 +79,29 @@ const rules = {
   ],
   password_confirmation: [
     { required: true, message: 'Please confirm your password', trigger: ['input', 'blur'] },
+    {
+      validator: (rule, value) => value === formValue.value.password,
+      message: 'Passwords do not match',
+      trigger: ['input', 'blur'],
+    },
   ],
 }
 
+onMounted(() => {
+  // Prefill from query if present
+  if (route.query.email) formValue.value.email = String(route.query.email)
+})
+
 const submitReset = async () => {
   loading.value = true
-
   try {
+    const token = (route.query.token ?? route.params.token) || ''
     await axios.post('/reset-password', {
-      token: route.params.token,
-      ...formValue.value,
+      token,
+      email: formValue.value.email,
+      password: formValue.value.password,
+      password_confirmation: formValue.value.password_confirmation,
     })
-
     message.success('Password reset successfully. You can now log in.')
     router.push('/login')
   } catch (error) {
@@ -108,6 +112,7 @@ const submitReset = async () => {
   }
 }
 </script>
+
 
 <style scoped>
 .reset-container {

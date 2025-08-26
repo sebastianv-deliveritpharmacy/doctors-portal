@@ -43,7 +43,7 @@ class UserController extends Controller
                 $welcome = new \App\Mail\WelcomeMail(
                     $user->name,
                     'https://deliveritpharmacy.com/wp-content/uploads/2024/04/DeliverIt-Hero.jpg',
-                    'https://portal.deliveritgroup.us/admin', // admin landing (adjust if needed)
+                    'https://portal.deliveritgroup.us/login', // admin landing (adjust if needed)
                     $features,
                     false // isAdmin
                 );
@@ -90,7 +90,7 @@ class UserController extends Controller
                 $welcome = new \App\Mail\WelcomeMail(
                     $user->name,
                     'https://deliveritpharmacy.com/wp-content/uploads/2024/04/DeliverIt-Hero.jpg',
-                    'https://portal.deliveritgroup.us/admin', // admin landing (adjust if needed)
+                    'https://portal.deliveritgroup.us/login', // admin landing (adjust if needed)
                     $features,
                     false // isAdmin
                 );
@@ -184,7 +184,7 @@ class UserController extends Controller
                 $welcome = new \App\Mail\WelcomeMail(
                     $user->name,
                     'https://deliveritpharmacy.com/wp-content/uploads/2024/04/DeliverIt-Hero.jpg',
-                    'https://portal.deliveritgroup.us/admin', // admin landing (adjust if needed)
+                    'https://portal.deliveritgroup.us/login', // admin landing (adjust if needed)
                     $features,
                     true // isAdmin
                 );
