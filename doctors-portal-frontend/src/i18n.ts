@@ -202,16 +202,16 @@ const messages = {
       unknown: 'Unknown',
       table: {
           id: 'ID',
-          patient: 'Paciente',
-          prescription: 'Receta',
-          dob: 'Fecha de Nacimiento',
-          insurance: 'Seguro',
-          city: 'Ciudad',
-          source: 'Fuente',
-          arrived: 'Fecha de Llegada',
-          status: 'Estado',
-          actions: 'Acciones',
-          edit: 'Editar'
+          patient: 'Patient',
+          prescription: 'Prescription',
+          dob: 'DOB',
+          insurance: 'Insurance',
+          city: 'City',
+          source: 'Source',
+          arrived: 'Arrival Date',
+          status: 'Status',
+          actions: 'Actions',
+          edit: 'Edit'
         }
     },
     emailVerified: {
