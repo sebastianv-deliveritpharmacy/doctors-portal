@@ -7,7 +7,7 @@
           <div class="greeting-left">
             <n-statistic
               :label="''"
-              :value="t('userDash.greeting', { name: user.name || '' })"
+              :value="`${t('userDash.greeting')} ${username}`"
             />
             <div class="subtext">{{ t('userDash.subtext') }}</div>
           </div>
@@ -75,7 +75,8 @@ import { fetchShipments } from '@/api/shipment'
 const { t } = useI18n()
 
 const message = useMessage()
-const user = ref({ name: '', email: '' })
+const username = ref('username')
+
 const prescriptions = ref([])
 const isLoading = ref(false)
 
@@ -84,10 +85,28 @@ const pageSize = ref(20)
 const totalItems = ref(0)
 const searchTerm = ref('')
 
+// Get user from localStorage or API
 const getUser = async () => {
   try {
+    // First try to get from localStorage
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser)
+      username.value = parsedUser.name;
+      return
+    }
+
+    // If not in localStorage, fetch from API
     const response = await getCurrentUser()
-    user.value = response.data
+    const payload = response?.data?.user ?? response?.data
+    
+    if (payload && typeof payload === 'object') {
+        username.value = parsedUser.name;
+
+      
+      // Store in localStorage for future use
+      localStorage.setItem('user', JSON.stringify(user.value))
+    }
   } catch (error) {
     console.error('Failed to fetch user', error)
     message.error(t('userDash.errors.fetchUser'))
@@ -129,7 +148,6 @@ onMounted(() => {
 })
 
 const columns = computed(() => [
-  // { title: 'ID', key: 'id', className: 'hide-on-mobile', width: 80 },
   {
     title: t('userDash.table.patient'),
     key: 'patient_name',
