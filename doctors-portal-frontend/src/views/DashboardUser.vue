@@ -89,7 +89,7 @@ const searchTerm = ref('')
 const getUser = async () => {
   try {
     // First try to get from localStorage
-    const storedUser = localStorage.getItem('user_data')
+    const storedUser = localStorage.getItem('user')
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser)
       username.value = parsedUser.name;
@@ -105,7 +105,7 @@ const getUser = async () => {
 
       
       // Store in localStorage for future use
-      localStorage.setItem('user_data', JSON.stringify(user.value))
+      localStorage.setItem('user', JSON.stringify(user.value))
     }
   } catch (error) {
     console.error('Failed to fetch user', error)
