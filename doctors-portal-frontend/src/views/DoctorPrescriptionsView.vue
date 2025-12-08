@@ -265,9 +265,18 @@
   const getPrescriptions = async () => {
     try {
       isLoading.value = true
-      const response = await fetchShipmentsByDoctor(doctorId, currentPage.value, pageSize.value, searchTerm.value)
+      const response = await fetchShipmentsByDoctor(
+        doctorId,
+        currentPage.value,
+        pageSize.value,
+        searchTerm.value
+      )
+
       doctorName.value = response.data.user_name || 'Doctor'
-      prescriptions.value = response.data.data.data.map(item => ({
+
+      const paginator = response.data.data // <- this is the paginator object
+
+      prescriptions.value = paginator.data.map(item => ({
         id: item.id,
         name: item.prescription_name || '-',
         status: item.status || 'unknown',
@@ -279,7 +288,9 @@
         arrived_to_office_date: item.arrived_to_office_date || '-',
         arrived_to_office_time: item.arrived_to_office_time || '-'
       }))
-      totalItems.value = response.data.total
+
+      // IMPORTANT: use paginator.total, not response.data.total
+      totalItems.value = paginator.total
     } catch (err) {
       console.error('Error fetching shipments:', err)
       message.error(t('dashboardPrescription.errorUploadShipment'))
@@ -287,6 +298,7 @@
       isLoading.value = false
     }
   }
+
 
   function formatDateForBackend(timestamp) {
     if (!timestamp) return null
