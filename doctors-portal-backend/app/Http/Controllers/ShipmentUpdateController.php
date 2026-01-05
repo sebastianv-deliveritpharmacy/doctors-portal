@@ -150,7 +150,7 @@ class ShipmentUpdateController extends Controller
     //         'patient_name'           => 'required|string',
     //         'prescription_name'      => 'nullable|string',
     //         'status'                 => 'nullable|string',
-    //         'sheet_identefier'       => 'required|string',
+    //         'sheet_identifier'       => 'required|string',
     //         'date_of_birth'          => 'nullable|date',
     //         'insurance'              => 'nullable|string',
     //         'city'                   => 'nullable|string',
@@ -164,7 +164,7 @@ class ShipmentUpdateController extends Controller
     //     ]);
 
     //     // ✅ Clean and normalize the sheet identifier
-    //     $cleanedIdentifier = trim(strtolower($data['sheet_identefier']));
+    //     $cleanedIdentifier = trim(strtolower($data['sheet_identifier']));
 
     //     // ✅ Try to match against user
     //     $matchingUsers = \App\Models\User::whereRaw('LOWER(TRIM(sheet_identifier)) LIKE ?', [
@@ -173,7 +173,7 @@ class ShipmentUpdateController extends Controller
 
 
     //     if ($matchingUsers->isEmpty()) {
-    //         return response()->json(['message' => 'No matching user found for the provided sheet_identefier'], 404);
+    //         return response()->json(['message' => 'No matching user found for the provided sheet_identifier'], 404);
     //     }
 
     //     $results = [];
@@ -378,21 +378,35 @@ class ShipmentUpdateController extends Controller
      * POST /api/import-from-sheet
      */
     public function importFromSheet(Request $request)
-    {
-        Log::info('✅ Google Sheet request hit the controller.');
+{
+    Log::info('🚀 [STEP 1] importFromSheet() hit', [
+        'headers' => $request->headers->all(),
+        'payload' => $request->all(),
+    ]);
 
-        // ✅ Verify the key
+    try {
+
+        // -------------------------------------------------
+        // STEP 2: API KEY VALIDATION
+        // -------------------------------------------------
         $apiKey = $request->header('X-API-KEY');
+        Log::info('🔑 [STEP 2] API Key received', ['key' => $apiKey]);
+
         if ($apiKey !== config('services.shipment_sheet.api_key')) {
+            Log::warning('⛔ [STEP 2 FAILED] Invalid API Key');
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        // ✅ Validate incoming payload
+        // -------------------------------------------------
+        // STEP 3: REQUEST VALIDATION
+        // -------------------------------------------------
+        Log::info('🧪 [STEP 3] Validating payload');
+
         $data = $request->validate([
             'patient_name'           => 'required|string',
             'prescription_name'      => 'nullable|string',
             'status'                 => 'nullable|string',
-            'sheet_identefier'       => 'required|string', // doctor identifier from the sheet
+            'sheet_identifier'       => 'required|string',
             'date_of_birth'          => 'nullable|date',
             'insurance'              => 'nullable|string',
             'city'                   => 'nullable|string',
@@ -405,27 +419,37 @@ class ShipmentUpdateController extends Controller
             'delivered_at'           => 'nullable|date',
         ]);
 
-        // ✅ Clean and normalize the incoming doctor identifier
-        $rawIdentifier   = $data['sheet_identefier'];
-        $norm            = $this->normalizeName($rawIdentifier);
-        $normFlipped     = $this->flipIfCommaFormat($rawIdentifier, $norm);
-        $lastKey         = $this->lastNameKey($normFlipped); // "elkhalili", "abdellatif" etc.
+        Log::info('✅ [STEP 3 PASSED] Payload validated', $data);
 
-        // If we couldn't derive a last key, bail early
+        // -------------------------------------------------
+        // STEP 4: IDENTIFIER NORMALIZATION
+        // -------------------------------------------------
+        $rawIdentifier = $data['sheet_identifier'];
+        Log::info('🧠 [STEP 4] Normalizing identifier', ['raw' => $rawIdentifier]);
+
+        $norm        = $this->normalizeName($rawIdentifier);
+        $normFlipped = $this->flipIfCommaFormat($rawIdentifier, $norm);
+        $lastKey     = $this->lastNameKey($normFlipped);
+
+        Log::info('🧠 [STEP 4 RESULT]', compact('norm', 'normFlipped', 'lastKey'));
+
         if (!$lastKey) {
-            return response()->json(['message' => 'Unable to derive last name key from sheet_identefier'], 422);
+            Log::warning('❌ [STEP 4 FAILED] Unable to derive lastKey');
+            return response()->json([
+                'message' => 'Unable to derive last name key from sheet_identifier'
+            ], 422);
         }
 
-        // We'll perform a resilient LIKE match against users.sheet_identifier
-        // BUT we normalize on-the-fly (in PHP) for both sides.
-        // To do this efficiently in SQL, you can either:
-        //  1) add a pre-normalized column on users (recommended), or
-        //  2) fetch a small candidate set and filter in PHP (done below).
-
-        // First pass: pull candidate users whose raw sheet_identifier
-        // contains any of the key parts to limit the set.
+        // -------------------------------------------------
+        // STEP 5: FETCH USER CANDIDATES
+        // -------------------------------------------------
         $likeLast   = '%' . $lastKey . '%';
         $likeShort1 = '%' . mb_substr($lastKey, 0, max(2, (int) floor(mb_strlen($lastKey)/2))) . '%';
+
+        Log::info('🔍 [STEP 5] Searching candidate users', [
+            'likeLast'   => $likeLast,
+            'likeShort1' => $likeShort1,
+        ]);
 
         $candidates = User::query()
             ->whereNotNull('sheet_identifier')
@@ -435,65 +459,93 @@ class ShipmentUpdateController extends Controller
             })
             ->get();
 
-        // Second pass: normalize each candidate's identifier and compare in PHP
+        Log::info('👥 [STEP 5 RESULT] Candidate users found', [
+            'count' => $candidates->count(),
+            'ids'   => $candidates->pluck('id'),
+        ]);
+
+        // -------------------------------------------------
+        // STEP 6: PHP NORMALIZED MATCH
+        // -------------------------------------------------
         $matchingUsers = $candidates->filter(function (User $u) use ($lastKey, $normFlipped) {
             $userNorm = $this->normalizeIdentifierForMatch($u->sheet_identifier);
 
-            // direct last-name presence
-            if (str_contains($userNorm, $lastKey)) {
-                return true;
-            }
+            if (str_contains($userNorm, $lastKey)) return true;
+            if (str_contains($userNorm, $normFlipped)) return true;
 
-            // fuller match (e.g., "abdelnasir elkhalili")
-            if (str_contains($userNorm, $normFlipped)) {
-                return true;
-            }
-
-            // If user stored "LAST FIRST" only, try flipping our normalized again
             $tokens = explode(' ', $normFlipped);
             if (count($tokens) >= 2) {
-                $first = $tokens[0];
-                $last  = end($tokens);
-                $alt   = trim($last . ' ' . $first);
-                if (str_contains($userNorm, $alt)) {
-                    return true;
-                }
+                $alt = trim(end($tokens) . ' ' . $tokens[0]);
+                if (str_contains($userNorm, $alt)) return true;
             }
 
             return false;
         })->values();
 
+        Log::info('✅ [STEP 6 RESULT] Matching users', [
+            'count' => $matchingUsers->count(),
+            'ids'   => $matchingUsers->pluck('id'),
+        ]);
+
         if ($matchingUsers->isEmpty()) {
-            return response()->json(['message' => 'No matching user found for the provided sheet_identefier'], 404);
+            Log::warning('❌ [STEP 6 FAILED] No matching user found');
+            return response()->json([
+                'message' => 'No matching user found for the provided sheet_identifier'
+            ], 404);
         }
 
+        // -------------------------------------------------
+        // STEP 7: PROCESS EACH USER
+        // -------------------------------------------------
         $results = [];
 
         foreach ($matchingUsers as $user) {
+            Log::info('👤 [STEP 7] Processing user', ['user_id' => $user->id]);
+
             $payload = $data;
             $payload['user_id'] = $user->id;
 
-           // Combine arrival datetime (date + time) → store in UTC
+            // -------------------------------------------------
+            // STEP 8: DATE PARSING
+            // -------------------------------------------------
+            Log::info('🕒 [STEP 8] Parsing arrival datetime', [
+                'date' => $payload['arrived_to_office_date'] ?? null,
+                'time' => $payload['arrived_to_office_time'] ?? null,
+            ]);
+
             $payload['arrived_to_office_date'] = $this->parseArrivalDateTimeToUtc(
                 $payload['arrived_to_office_date'] ?? null,
                 $payload['arrived_to_office_time'] ?? null,
-                'America/Chicago' // source timezone
+                'America/Chicago'
             );
             unset($payload['arrived_to_office_time']);
 
             if (!empty($payload['date_shipped'])) {
-                $payload['date_shipped'] = $this->parseArrivalDateTimeToUtc($payload['date_shipped'], null, 'America/Chicago');
+                $payload['date_shipped'] = $this->parseArrivalDateTimeToUtc(
+                    $payload['date_shipped'], null, 'America/Chicago'
+                );
             }
+
             if (!empty($payload['delivered_at'])) {
-                $payload['delivered_at'] = $this->parseArrivalDateTimeToUtc($payload['delivered_at'], null, 'America/Chicago');
+                $payload['delivered_at'] = $this->parseArrivalDateTimeToUtc(
+                    $payload['delivered_at'], null, 'America/Chicago'
+                );
             }
 
+            Log::info('📦 [STEP 8 RESULT] Parsed dates', [
+                'arrived_to_office_date' => $payload['arrived_to_office_date'],
+                'date_shipped'           => $payload['date_shipped'] ?? null,
+                'delivered_at'           => $payload['delivered_at'] ?? null,
+            ]);
 
-            // Check for existing shipment (idempotency by user + patient + rx/prescription)
+            // -------------------------------------------------
+            // STEP 9: IDEMPOTENCY CHECK
+            // -------------------------------------------------
+            Log::info('🔎 [STEP 9] Checking existing shipment');
+
             $existing = ShipmentUpdate::where('user_id', $payload['user_id'])
                 ->where('patient_name', $payload['patient_name'])
                 ->where(function ($q) use ($payload) {
-                    // Prefer matching by rx_number if provided; else by prescription_name
                     if (!empty($payload['rx_number'])) {
                         $q->where('rx_number', $payload['rx_number']);
                     } else {
@@ -503,8 +555,9 @@ class ShipmentUpdateController extends Controller
                 ->first();
 
             if ($existing) {
-                // only update dirty fields
-                $dirty = collect($payload)->filter(fn ($value, $key) => $existing->$key !== $value);
+                Log::info('♻️ [STEP 9] Existing shipment found', ['id' => $existing->id]);
+
+                $dirty = collect($payload)->filter(fn ($v, $k) => $existing->$k !== $v);
                 if ($dirty->isNotEmpty()) {
                     $existing->update($payload);
                     $message = 'Shipment update modified';
@@ -512,16 +565,15 @@ class ShipmentUpdateController extends Controller
                     $message = 'No changes detected — skipped update';
                 }
 
-                Log::info("✅ Updating shipment for patient: {$payload['patient_name']} (User ID: {$user->id})");
-
                 $results[] = [
                     'user_id' => $user->id,
                     'message' => $message,
                     'data'    => $existing->fresh(),
                 ];
             } else {
+                Log::info('🆕 [STEP 9] Creating new shipment');
+
                 $shipment = ShipmentUpdate::create($payload);
-                Log::info("✅ Creating new shipment for patient: {$payload['patient_name']} (User ID: {$user->id})");
 
                 $results[] = [
                     'user_id' => $user->id,
@@ -531,7 +583,23 @@ class ShipmentUpdateController extends Controller
             }
         }
 
+        Log::info('🎉 [FINAL] importFromSheet completed successfully');
+
         return response()->json($results);
+
+    } catch (\Throwable $e) {
+        Log::error('🔥 [FATAL ERROR] importFromSheet crashed', [
+            'message' => $e->getMessage(),
+            'file'    => $e->getFile(),
+            'line'    => $e->getLine(),
+            'trace'   => $e->getTraceAsString(),
+        ]);
+
+        return response()->json([
+            'message' => 'Internal server error'
+        ], 500);
     }
+}
+
 
 }
