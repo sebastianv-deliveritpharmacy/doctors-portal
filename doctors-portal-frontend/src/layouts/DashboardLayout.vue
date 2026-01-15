@@ -16,14 +16,14 @@
       <router-link to="/">
         <img
           v-if="!isCollapsed"
-          src="https://deliveritpharmacy.com/wp-content/uploads/2024/04/Logo-Resurrgaction-B-Vertical.png"
+          src="../assets/logo.png"
           alt="Deliverit Logo"
           class="logo-img"
           style="width: 120px; margin: 20px;"
         />
         <img
           v-else
-          src="https://deliveritpharmacy.com/wp-content/uploads/2024/04/DPIC-emblem.png"
+          src="../assets/DPIC-emblem.png"
           alt="Deliverit Emblem"
           class="logo-img"
           style="width: 40px; margin: 12px auto; display: block;"
@@ -58,7 +58,7 @@
         <div style="display: flex; gap: 8px; justify-content: center;">
           <a href="https://deliveritpharmacy.com" target="_blank" rel="noopener">
             <img
-              src="https://deliveritpharmacy.com/wp-content/uploads/2024/04/Logo-Resurrgaction-B-Vertical.png"
+              src="../assets/logo.png"
               alt="DeliverIt Pharmacy"
               style="width: 70px; height: 50px; object-fit: contain;"
             />

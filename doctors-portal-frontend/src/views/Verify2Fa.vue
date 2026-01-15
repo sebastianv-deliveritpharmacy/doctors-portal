@@ -2,7 +2,7 @@
 <template>
   <div class="verify-wrapper">
     <img
-      src="https://deliveritpharmacy.com/wp-content/uploads/2024/04/Logo-Resurrgaction-B-Vertical.png"
+      src="../assets/logo.png"
       alt="DeliverIt Logo"
       class="logo"
     />
