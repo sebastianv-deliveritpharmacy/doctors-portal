@@ -9,7 +9,7 @@
         <n-space vertical justify="center" align="center">
           <!-- Logo -->
           <img
-            src="https://deliveritpharmacy.com/wp-content/uploads/2024/04/Logo-Resurrgaction-B-Vertical.png"
+            src="../assets/logo.png"
             alt="Deliverit Logo"
             class="logo-img"
             style="width: 200px;"
